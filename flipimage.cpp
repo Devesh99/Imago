@@ -21,5 +21,6 @@ flipimage::~flipimage(){
 
 // virtual process function definition
 void flipimage::process(cv::Mat& ip, cv::Mat& op){
+    // + : horizontal, 0 : vertical, - :both
     cv::flip(ip, op, flipcode);
 }

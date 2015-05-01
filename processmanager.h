@@ -18,7 +18,7 @@ class processmanager : public QObject
 private:
     cv::Mat ip;
     cv::Mat op;
-    std::vector<Iprocesstechnique*> processtechniquesList;
+    std::vector<Iprocesstechnique*> processtechniquesList; // stores user selected algorithm instances to process in process function loop
 
     // storing image matrices used for display in rendering on pixmap
     cv::Mat ipRGB;
@@ -33,10 +33,10 @@ private:
 public:
     processmanager(); // constructor
 
+
     // --------------------------
     // accessors and mutators for images
     // --------------------------
-
     // accessors Input/output
     cv::Mat getInputImage(void)const;
     cv::Mat getOutputImage(void)const;
@@ -57,6 +57,7 @@ public:
     bool setInputImageQImage(QImage);
     bool setOutputImageQImage(QImage);
 
+
     // --------------------------
     // accessor for techniqueslist
     // --------------------------
@@ -69,15 +70,17 @@ public:
     void addProcessTechnique();
 
 
+private slots:
     // --------------------------
     // Execute
     // --------------------------
-    void process();
+    void process(); // defined as slot to allow connection with signals, such as when image input is ready
 
 
 signals:
     void ImageReadyInput(); // to display input image
     void ImageReadyOutput(); // to display output image
+
 
 };
 

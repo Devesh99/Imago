@@ -49,10 +49,8 @@ void Imago::DisplayInputImage(){
 }
 
 void Imago::DisplayOutputImage(){
-    cout<<"here"<<endl;
     if (controller->getOutputImage().channels()==3){
         cvtColor(controller->getOutputImage(),controller->getOutputImageRGB(),CV_BGR2RGB);
-        cout<<"here1"<<endl;
         controller->setOutputImageQImage(QImage((const unsigned char*)(controller->getOutputImageRGB().data),controller->getOutputImageRGB().cols,controller->getOutputImageRGB().rows,QImage::Format_RGB888));
     }
     else{

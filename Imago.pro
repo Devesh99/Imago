@@ -12,12 +12,13 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Imago
 TEMPLATE = app
 
+# Modify to reflect your installation path
 INCLUDEPATH += "/usr/local/include"
 INCLUDEPATH += "/usr/local/include/opencv"
 INCLUDEPATH += "/usr/local/include/opencv2"
 
+# Modify to reflect your isntallation path
 LIBS += -L/usr/local/lib
-
 LIBS += -lopencv_core
 LIBS += -lopencv_highgui
 LIBS += -lopencv_imgproc
@@ -46,3 +47,8 @@ HEADERS  += imago.h \
     allalgorithms.h
 
 FORMS    += imago.ui
+
+# Add resources to contain default image, icon images ...
+
+OTHER_FILES += \
+    References.txt

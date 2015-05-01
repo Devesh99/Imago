@@ -10,6 +10,8 @@ processmanager::processmanager()
     const char* strarray[] = {"flip image", "salt and pepper"};
     std::vector<std::string> strvector(strarray, strarray + sizeof(strarray)/sizeof(strarray[0])); // [1]
     techniquesList = strvector;
+
+    QObject::connect(this, SIGNAL(ImageReadyInput()), this, SLOT(process())); // this way, opening a new image/video/live stream continues the defined process flow processing for the new frame(s) as well, as process is called
 }
 
 // --------------------------
@@ -25,6 +27,7 @@ bool processmanager::setInputImage(const cv::Mat &M){
         return true;
     }
     else{
+        // error handling: if no image received (eg: user pressed cancel in dialog box)
         return false;
     }
 }
@@ -137,7 +140,3 @@ void processmanager::process(){
     emit ImageReadyOutput();
 }
 
-
-// References
-
-// [1] http://stackoverflow.com/questions/34987/how-to-declare-an-array-of-strings-in-c
