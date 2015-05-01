@@ -40,7 +40,6 @@ private:
 public:
     processmanager(); // constructor
 
-
     // --------------------------
     // accessors and mutators for images
     // --------------------------

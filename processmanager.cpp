@@ -131,9 +131,9 @@ void processmanager::addProcessTechnique(){
     Iprocesstechnique* pt = new flipimage;
     processtechniquesList.push_back(pt);
 
-    emit UpdateListWidgetSignal();
-
     process();
+
+    emit UpdateListWidgetSignal();
 }
 
 
@@ -141,9 +141,12 @@ void processmanager::addProcessTechnique(){
 // Process function
 // --------------------------
 void processmanager::process(){
+    // error-handling: necessary as output matrix is used in sucession, which should be refreshed to the original input at the beginning of the process loop
+    ip.copyTo(op);
+
     std::vector<Iprocesstechnique*>::iterator it;
     for (it=processtechniquesList.begin(); it!=processtechniquesList.end(); it++){
-        (*it)->process(ip, op);
+        (*it)->process(op, op);
     }
 
     emit ImageReadyOutput();
@@ -174,7 +177,6 @@ void processmanager::loadVideo(std::string filename){
     if (capture.isOpened()){
         double rate = capture.get(CV_CAP_PROP_FPS);
         framedelay=1000/rate;
-        std::cout<<rate<<" "<<framedelay<<std::endl;
         // timer restarts (no need to stop and start) [2]
         timer->start(framedelay); // set for pause/play utilization
     }
@@ -200,7 +202,6 @@ void processmanager::ReadFrame(){
     // timer callback function to set input image frame from video/live stream
     cv::Mat frame;
     capture>>frame;
-    //std::cout<<timer->interval()<<" "<<framedelay<<std::endl;
     setInputImage(frame);
 }
 
