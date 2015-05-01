@@ -2,6 +2,7 @@
 #define PROCESSMANAGER_H
 
 #include "iprocesstechnique.h"
+#include "allalgorithms.h"
 
 #include <QObject>
 #include <QImage>
@@ -26,7 +27,8 @@ private:
     QImage ipQImage;
     QImage opQImage;
 
-//    std::vector<std::string> techniquesList;
+    std::vector<std::string> techniquesList; // stores names of all available techniques (for display in combo box)
+
 
 public:
     processmanager(); // constructor
@@ -36,8 +38,8 @@ public:
     // --------------------------
 
     // accessors Input/output
-    const cv::Mat getInputImage(void)const;
-    const cv::Mat getOutputImage(void)const;
+    cv::Mat getInputImage(void)const;
+    cv::Mat getOutputImage(void)const;
     // mutators input/output
     bool setInputImage(const cv::Mat&);
     bool setInputImage(std::string filename); // overloaded mutator for input with filename
@@ -53,13 +55,26 @@ public:
     QImage getOutputImageQImage(void)const;
     // mutators (QImage)
     bool setInputImageQImage(QImage);
+    bool setOutputImageQImage(QImage);
 
     // --------------------------
     // accessor for techniqueslist
     // --------------------------
-//    const std::vector<std::string> getTechniquesList(void)const;
+    const std::vector<std::string> getTechniquesList(void)const;
 
-    //
+
+    // --------------------------
+    // Add/remove processing techniques
+    // --------------------------
+    void addProcessTechnique();
+
+
+    // --------------------------
+    // Execute
+    // --------------------------
+    void process();
+
+
 signals:
     void ImageReadyInput(); // to display input image
     void ImageReadyOutput(); // to display output image

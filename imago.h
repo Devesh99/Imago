@@ -22,7 +22,7 @@ private:
     // controller
     processmanager *controller;
 
-//    void updateComboBox(void)const;
+    void updateComboBox(void)const;
 
 private slots:
     void on_actionOpen_Image_triggered();
@@ -30,6 +30,7 @@ private slots:
     void DisplayInputImage(); // function to display input image in input label
 
     void DisplayOutputImage(); // function to display output image in output label
+    void on_AddTechnique_clicked();
 };
 
 #endif // IMAGO_H

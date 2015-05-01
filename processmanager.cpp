@@ -6,9 +6,10 @@
 
 processmanager::processmanager()
 {
-//    const char* strarray[] = {"flip image"};
-//    std::vector<std::string> strvector(strarray, strarray+3); // [1]
-//    techniquesList = strvector;
+    // creating a vector of string to store the names of the techniques
+    const char* strarray[] = {"flip image", "salt and pepper"};
+    std::vector<std::string> strvector(strarray, strarray + sizeof(strarray)/sizeof(strarray[0])); // [1]
+    techniquesList = strvector;
 }
 
 // --------------------------
@@ -18,6 +19,8 @@ bool processmanager::setInputImage(const cv::Mat &M){
     if (M.data){
         ip = M.clone();
         ipRGB = ip.clone(); // set as copy of input image (otherwise error in display image when uninitialized)
+        op = ip.clone(); // set as copy of input image (otherwise error in display image when uninitialized)
+        opRGB = ip.clone(); // set as copy of input image (otherwise error in display image when uninitialized)
         emit ImageReadyInput();
         return true;
     }
@@ -30,20 +33,23 @@ bool processmanager::setInputImage(std::string filename){
     ip = cv::imread(filename);
 
     if (!ip.data){
+        // error handling: if no image received (eg: user pressed cancel in dialog box)
         return false;
     }
     else{
         ipRGB = ip.clone(); // set as copy of input image for initialization (otherwise error in display image when uninitialized)
+        op = ip.clone(); // set as copy of input image (otherwise error in display image when uninitialized)
+        opRGB = ip.clone(); // set as copy of input image (otherwise error in display image when uninitialized)
         emit ImageReadyInput();
         return true;
     }
 }
 
-const cv::Mat processmanager::getInputImage()const{
+cv::Mat processmanager::getInputImage()const{
     return ip;
 }
 
-const cv::Mat processmanager::getOutputImage()const{
+cv::Mat processmanager::getOutputImage()const{
     return op;
 }
 
@@ -82,6 +88,16 @@ bool processmanager::setInputImageQImage(QImage M){
     }
 }
 
+bool processmanager::setOutputImageQImage(QImage M){
+    if (!M.isNull()){
+        opQImage = M.copy();
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
 QImage processmanager::getInputImageQImage()const{
     return ipQImage;
 }
@@ -94,9 +110,32 @@ QImage processmanager::getOutputImageQImage()const{
 // --------------------------
 // Accessor for techniquesList
 // --------------------------
-//const std::vector<std::string> processmanager::getTechniquesList(void)const{
-//    return techniquesList;
-//}
+const std::vector<std::string> processmanager::getTechniquesList(void)const{
+    return techniquesList;
+}
+
+
+// --------------------------
+// Add/remove process technique
+// --------------------------
+void processmanager::addProcessTechnique(){
+    Iprocesstechnique* pt = new flipimage;
+    processtechniquesList.push_back(pt);
+
+    process();
+}
+
+// --------------------------
+// Process function
+// --------------------------
+void processmanager::process(){
+    std::vector<Iprocesstechnique*>::iterator it;
+    for (it=processtechniquesList.begin(); it!=processtechniquesList.end(); it++){
+        (*it)->process(ip, op);
+    }
+
+    emit ImageReadyOutput();
+}
 
 
 // References

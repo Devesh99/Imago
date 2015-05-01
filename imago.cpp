@@ -17,8 +17,10 @@ Imago::Imago(QWidget *parent) :
 
     // connecting display input signal from process manager(controller) with slot
     QObject::connect(controller, SIGNAL(ImageReadyInput()), this, SLOT(DisplayInputImage()));
+    QObject::connect(controller, SIGNAL(ImageReadyOutput()), this, SLOT(DisplayOutputImage()));
 
-    //updateComboBox();
+    // show list of techniques available in combo box upon start up
+    updateComboBox();
 }
 
 Imago::~Imago()
@@ -47,13 +49,30 @@ void Imago::DisplayInputImage(){
 }
 
 void Imago::DisplayOutputImage(){
+    cout<<"here"<<endl;
+    if (controller->getOutputImage().channels()==3){
+        cvtColor(controller->getOutputImage(),controller->getOutputImageRGB(),CV_BGR2RGB);
+        cout<<"here1"<<endl;
+        controller->setOutputImageQImage(QImage((const unsigned char*)(controller->getOutputImageRGB().data),controller->getOutputImageRGB().cols,controller->getOutputImageRGB().rows,QImage::Format_RGB888));
+    }
+    else{
+        controller->setOutputImageQImage(QImage((const unsigned char*)(controller->getOutputImageRGB().data),controller->getOutputImageRGB().cols,controller->getOutputImageRGB().rows,QImage::Format_Indexed8));
+    }
 
+    ui->LabelOutput->setPixmap(QPixmap::fromImage(controller->getOutputImageQImage()));
 }
 
-//void Imago::updateComboBox(void)const{
-//    std::vector<std::string> v = controller->getTechniquesList();
-//    std::vector<std::string>::iterator it;
-//    for (it = v.begin(); it!=v.end();it++){
-//        ui->AddTechniquesComboBox->addItem(QString::fromStdString(*it));
-//    }
-//}
+void Imago::updateComboBox(void)const{
+    // updates the combo box with list of techniques available upon start up
+
+    std::vector<std::string> v = controller->getTechniquesList(); // temporary vector to store accessed conotrller member
+    std::vector<std::string>::iterator it;
+    for (it = v.begin(); it!=v.end();it++){
+        ui->AddTechniquesComboBox->addItem(QString::fromStdString(*it)); // conversion to qstring required
+    }
+}
+
+void Imago::on_AddTechnique_clicked()
+{
+    controller->addProcessTechnique();
+}

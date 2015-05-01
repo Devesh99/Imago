@@ -42,6 +42,7 @@ SOURCES += main.cpp\
 HEADERS  += imago.h \
     iprocesstechnique.h \
     flipimage.h \
-    processmanager.h
+    processmanager.h \
+    allalgorithms.h
 
 FORMS    += imago.ui
