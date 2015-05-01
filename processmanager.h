@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QImage>
 #include <QString>
+#include <QTimer>
 
 // --------------------------
 // Controller class
@@ -28,6 +29,12 @@ private:
     QImage opQImage;
 
     std::vector<std::string> techniquesList; // stores names of all available techniques (for display in combo box)
+
+    // Video/live stream member attributes
+    QTimer *timer;
+    cv::VideoCapture capture; // video + livestream object
+    int framedelay; // for timer object
+
 
 
 public:
@@ -69,18 +76,28 @@ public:
     // --------------------------
     void addProcessTechnique();
 
+    // --------------------------
+    // Image/Video/live stream handlers
+    // --------------------------
+    void loadImage(std::string);
+    void loadVideo(std::string);
+    void loadLiveStream();
+
+    void pauseTimer(void);
+    void restartTimer(void);
 
 private slots:
-    // --------------------------
-    // Execute
-    // --------------------------
+    // Execute process
     void process(); // defined as slot to allow connection with signals, such as when image input is ready
 
+    // Read frame from video/live stream
+    void ReadFrame();
 
 signals:
     void ImageReadyInput(); // to display input image
     void ImageReadyOutput(); // to display output image
 
+    void UpdateListWidgetSignal(); // to display the selected technique in the process flow list widget
 
 };
 

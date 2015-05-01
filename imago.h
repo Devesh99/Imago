@@ -28,9 +28,16 @@ private slots:
     void on_actionOpen_Image_triggered();
 
     void DisplayInputImage(); // function to display input image in input label
-
     void DisplayOutputImage(); // function to display output image in output label
+
     void on_AddTechnique_clicked();
+
+    void on_actionOpen_Video_triggered();
+    void on_actionOpen_Livestream_triggered();
+
+    void UpdateListWidget();
+    void on_PauseTimer_clicked();
+    void on_RestartTimer_clicked();
 };
 
 #endif // IMAGO_H

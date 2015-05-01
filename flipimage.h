@@ -20,6 +20,8 @@ public:
 
     // virtual process function definition
     void process(cv::Mat&, cv::Mat&); // not virtual since would not be derived further
+
+    std::string getName(void) const;
 };
 
 #endif // FLIPIMAGE_H

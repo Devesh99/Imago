@@ -12,7 +12,13 @@ processmanager::processmanager()
     techniquesList = strvector;
 
     QObject::connect(this, SIGNAL(ImageReadyInput()), this, SLOT(process())); // this way, opening a new image/video/live stream continues the defined process flow processing for the new frame(s) as well, as process is called
+
+    framedelay = 0; // error-handling: otherwise garbage value. (though handlers set timer framedelay anyway, so not necessarily required)
+    timer = new QTimer(this);
+
+    connect(timer, SIGNAL(timeout()),this, SLOT(ReadFrame()));
 }
+
 
 // --------------------------
 // Accessors/mutators for images
@@ -125,8 +131,11 @@ void processmanager::addProcessTechnique(){
     Iprocesstechnique* pt = new flipimage;
     processtechniquesList.push_back(pt);
 
+    emit UpdateListWidgetSignal();
+
     process();
 }
+
 
 // --------------------------
 // Process function
@@ -140,3 +149,77 @@ void processmanager::process(){
     emit ImageReadyOutput();
 }
 
+
+// --------------------------
+// Image/Video/live stream handlers
+// --------------------------
+void processmanager::loadImage(std::string filename){
+    // handles the case where image is opened after video/live stream. (active timer must be stopped for new image to be used)
+    if (timer->isActive()){
+        timer->stop();
+        capture.release();
+    }
+    setInputImage(filename);
+}
+
+void processmanager::loadVideo(std::string filename){
+    // callback from open video push button
+
+    if (timer->isActive()){
+        timer->stop();
+        capture.release();
+    }
+
+    capture.open(filename);
+    if (capture.isOpened()){
+        double rate = capture.get(CV_CAP_PROP_FPS);
+        framedelay=1000/rate;
+        std::cout<<rate<<" "<<framedelay<<std::endl;
+        // timer restarts (no need to stop and start) [2]
+        timer->start(framedelay); // set for pause/play utilization
+    }
+}
+
+void processmanager::loadLiveStream(){
+    // callback from open live stream push button
+
+    if (timer->isActive()){
+        timer->stop();
+        capture.release();
+    }
+
+    capture.open(0);
+    if (capture.isOpened()){
+        // timer restarts (no need to stop and start) [2]
+        framedelay = 0; // set for pause/play utilization
+        timer->start(framedelay);
+    }
+}
+
+void processmanager::ReadFrame(){
+    // timer callback function to set input image frame from video/live stream
+    cv::Mat frame;
+    capture>>frame;
+    //std::cout<<timer->interval()<<" "<<framedelay<<std::endl;
+    setInputImage(frame);
+}
+
+void processmanager::pauseTimer(void){
+    // capture is not released to simulate pause
+
+    if (capture.isOpened()){
+        if (timer->isActive()){
+            timer->stop();
+        }
+    }
+}
+
+void processmanager::restartTimer(void){
+    // play after pause
+
+    if (capture.isOpened()){
+        if (!timer->isActive()){
+            timer->start(framedelay);
+        }
+    }
+}

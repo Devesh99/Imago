@@ -18,6 +18,7 @@ Imago::Imago(QWidget *parent) :
     // connecting display input signal from process manager(controller) with slot
     QObject::connect(controller, SIGNAL(ImageReadyInput()), this, SLOT(DisplayInputImage()));
     QObject::connect(controller, SIGNAL(ImageReadyOutput()), this, SLOT(DisplayOutputImage()));
+    QObject::connect(controller, SIGNAL(UpdateListWidgetSignal()), this, SLOT(UpdateListWidget()));
 
     // show list of techniques available in combo box upon start up
     updateComboBox();
@@ -32,7 +33,11 @@ Imago::~Imago()
 void Imago::on_actionOpen_Image_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), ".",tr("Image files(*.png *.jpg *.bmp"));
-    controller->setInputImage(fileName.toStdString());
+    // error-handling: empty filename (eg: user press cancel)
+    if (!fileName.isEmpty()){
+        controller->loadImage(fileName.toStdString());
+    }
+
 }
 
 void Imago::DisplayInputImage(){
@@ -73,4 +78,34 @@ void Imago::updateComboBox(void)const{
 void Imago::on_AddTechnique_clicked()
 {
     controller->addProcessTechnique();
+}
+
+void Imago::on_actionOpen_Video_triggered()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Video"), ".",tr("Video files(*.avi *.mov *.wmv, *.mp4"));
+    // error-handling: empty filename (eg: user press cancel)
+    if (!fileName.isEmpty()){
+        controller->loadVideo(fileName.toStdString());
+    }
+
+}
+
+void Imago::on_actionOpen_Livestream_triggered()
+{
+    controller->loadLiveStream();
+}
+
+
+void Imago::UpdateListWidget(){
+    ui->techniquesListWidget->addItem(ui->AddTechniquesComboBox->currentText());
+}
+
+void Imago::on_PauseTimer_clicked()
+{
+    controller->pauseTimer();
+}
+
+void Imago::on_RestartTimer_clicked()
+{
+    controller->restartTimer();
 }

@@ -16,6 +16,9 @@ public:
 
     // pure virtual processing function (to be completed by each derived algorithm class)
     virtual void process(cv::Mat&, cv::Mat&) = 0;
+
+    // pure virtual accessor to technique name (for display in list widget)
+    virtual std::string getName(void)const = 0;
 };
 
 
