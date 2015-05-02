@@ -1,6 +1,10 @@
 #ifndef IMAGO_H
 #define IMAGO_H
 
+// default images in application
+#define DefResourceImage ":/boldt.jpg" // resource file
+#define DefImage "boldt.jpg" // run directory
+
 #include <QMainWindow>
 #include "processmanager.h"
 
@@ -23,6 +27,8 @@ private:
     processmanager *controller;
 
     void updateComboBox(void)const;
+
+    void initializeDefaultInputImage(void)const;
 
 private slots:
     void on_actionOpen_Image_triggered();

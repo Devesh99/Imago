@@ -22,6 +22,10 @@ Imago::Imago(QWidget *parent) :
 
     // show list of techniques available in combo box upon start up
     updateComboBox();
+
+    // set default input image (from resource file)
+    initializeDefaultInputImage();
+
 }
 
 Imago::~Imago()
@@ -29,6 +33,26 @@ Imago::~Imago()
     delete controller; // deleting controller instance
     delete ui;
 }
+
+
+void Imago::updateComboBox(void)const{
+    // updates the combo box with list of techniques available upon start up
+
+    std::vector<std::string> v = controller->getTechniquesList(); // temporary vector to store accessed conotrller member
+    std::vector<std::string>::iterator it;
+    for (it = v.begin(); it!=v.end();it++){
+        ui->AddTechniquesComboBox->addItem(QString::fromStdString(*it)); // conversion to qstring required
+    }
+}
+
+void Imago::initializeDefaultInputImage(void)const{
+    // OpenCV could not access resource file, copying to run directory [A]
+    // resource file image could be loaded as QImage or QPixmap, but appeared distorted once used as Mat (no time to investigate this right now)
+    QFile::copy(DefResourceImage, DefImage);
+
+    controller->loadImage("boldt.jpg");
+}
+
 
 void Imago::on_actionOpen_Image_triggered()
 {
@@ -39,6 +63,22 @@ void Imago::on_actionOpen_Image_triggered()
     }
 
 }
+
+void Imago::on_actionOpen_Video_triggered()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Video"), ".",tr("Video files(*.avi *.mov *.wmv, *.mp4"));
+    // error-handling: empty filename (eg: user press cancel)
+    if (!fileName.isEmpty()){
+        controller->loadVideo(fileName.toStdString());
+    }
+
+}
+
+void Imago::on_actionOpen_Livestream_triggered()
+{
+    controller->loadLiveStream();
+}
+
 
 void Imago::DisplayInputImage(){
     if (controller->getInputImage().channels()==3){
@@ -65,40 +105,17 @@ void Imago::DisplayOutputImage(){
     ui->LabelOutput->setPixmap(QPixmap::fromImage(controller->getOutputImageQImage()));
 }
 
-void Imago::updateComboBox(void)const{
-    // updates the combo box with list of techniques available upon start up
-
-    std::vector<std::string> v = controller->getTechniquesList(); // temporary vector to store accessed conotrller member
-    std::vector<std::string>::iterator it;
-    for (it = v.begin(); it!=v.end();it++){
-        ui->AddTechniquesComboBox->addItem(QString::fromStdString(*it)); // conversion to qstring required
-    }
-}
 
 void Imago::on_AddTechnique_clicked()
 {
     controller->addProcessTechnique();
 }
 
-void Imago::on_actionOpen_Video_triggered()
-{
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Video"), ".",tr("Video files(*.avi *.mov *.wmv, *.mp4"));
-    // error-handling: empty filename (eg: user press cancel)
-    if (!fileName.isEmpty()){
-        controller->loadVideo(fileName.toStdString());
-    }
-
-}
-
-void Imago::on_actionOpen_Livestream_triggered()
-{
-    controller->loadLiveStream();
-}
-
 
 void Imago::UpdateListWidget(){
     ui->techniquesListWidget->addItem(ui->AddTechniquesComboBox->currentText());
 }
+
 
 void Imago::on_PauseTimer_clicked()
 {

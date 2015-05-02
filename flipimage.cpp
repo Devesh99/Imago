@@ -25,6 +25,3 @@ void flipimage::process(cv::Mat& ip, cv::Mat& op){
     cv::flip(ip, op, flipcode);
 }
 
-std::string flipimage::getName(void)const{
-    return "Flip image";
-}

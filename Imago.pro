@@ -52,3 +52,6 @@ FORMS    += imago.ui
 
 OTHER_FILES += \
     References.txt
+
+RESOURCES += \
+    resource.qrc

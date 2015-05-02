@@ -2,3 +2,8 @@ References
 
 [1] http://stackoverflow.com/questions/34987/how-to-declare-an-array-of-strings-in-c
 [2] http://doc.qt.io/qt-4.8/qtimer.html
+
+
+
+
+[A] Tasbir, Abinash Pant
