@@ -73,7 +73,7 @@ public:
     // --------------------------
     // Add/remove processing techniques
     // --------------------------
-    void addProcessTechnique();
+    void addProcessTechnique(const int&);
 
     // --------------------------
     // Image/Video/live stream handlers
@@ -91,6 +91,9 @@ private slots:
 
     // Read frame from video/live stream
     void ReadFrame();
+
+    // Algorithm instance mutators
+    void updateSaltAndPepperParams(const int&, const double&);
 
 signals:
     void ImageReadyInput(); // to display input image

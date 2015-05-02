@@ -38,20 +38,27 @@ SOURCES += main.cpp\
         imago.cpp \
     iprocesstechnique.cpp \
     flipimage.cpp \
-    processmanager.cpp
+    processmanager.cpp \
+    saltandpepper.cpp \
+    convertcolorspace.cpp \
+    histogramequalize.cpp
 
 HEADERS  += imago.h \
     iprocesstechnique.h \
     flipimage.h \
     processmanager.h \
-    allalgorithms.h
+    allalgorithms.h \
+    saltandpepper.h \
+    convertcolorspace.h \
+    histogramequalize.h
 
 FORMS    += imago.ui
 
-# Add resources to contain default image, icon images ...
 
+# references used for this project (cited next to corresponding code)
 OTHER_FILES += \
     References.txt
 
+# resource file to contain default image, icon images ...
 RESOURCES += \
     resource.qrc

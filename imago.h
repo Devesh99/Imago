@@ -30,6 +30,8 @@ private:
 
     void initializeDefaultInputImage(void)const;
 
+    void setRanges(void);
+
 private slots:
     void on_actionOpen_Image_triggered();
 
@@ -42,8 +44,14 @@ private slots:
     void on_actionOpen_Livestream_triggered();
 
     void UpdateListWidget();
+
     void on_PauseTimer_clicked();
     void on_RestartTimer_clicked();
+
+    void on_sp_noiselevel_valueChanged(int value);
+
+signals:
+    void updateSaltAndPepper(int, double);
 };
 
 #endif // IMAGO_H

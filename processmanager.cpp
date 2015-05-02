@@ -7,7 +7,7 @@
 processmanager::processmanager()
 {
     // creating a vector of string to store the names of the techniques
-    const char* strarray[] = {"flip image", "salt and pepper"};
+    const char* strarray[] = {"flip image", "salt and pepper", "histogram equalize"};
     std::vector<std::string> strvector(strarray, strarray + sizeof(strarray)/sizeof(strarray[0])); // [1]
     techniquesList = strvector;
 
@@ -127,13 +127,31 @@ const std::vector<std::string> processmanager::getTechniquesList(void)const{
 // --------------------------
 // Add/remove process technique
 // --------------------------
-void processmanager::addProcessTechnique(){
-    Iprocesstechnique* pt = new flipimage;
+void processmanager::addProcessTechnique(const int &indx){
+    Iprocesstechnique* pt;
+    switch(indx){
+    case 0:
+        pt = new flipimage;
+        break;
+    case 1:
+        pt = new saltandpepper;
+        break;
+    case 2:
+        pt = new histogramequalize;
+        break;
+    }
+
     processtechniquesList.push_back(pt);
 
     process();
 
     emit UpdateListWidgetSignal();
+}
+
+
+void processmanager::updateSaltAndPepperParams(const int& indx, const double& d){
+    dynamic_cast<saltandpepper*>(processtechniquesList[indx])->setParams(d);
+    process();
 }
 
 
