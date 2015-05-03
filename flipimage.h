@@ -21,6 +21,7 @@ public:
     // virtual process function definition
     void process(cv::Mat&, cv::Mat&); // not virtual since would not be derived further
 
+    void setParams(const short int&);
 };
 
 #endif // FLIPIMAGE_H

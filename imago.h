@@ -26,11 +26,16 @@ private:
     // controller
     processmanager *controller;
 
-    void updateComboBox(void)const;
+    void initializeConnections(void)const;
 
     void initializeDefaultInputImage(void)const;
 
     void setRanges(void);
+
+    void UpdateListWidget(std::string);
+
+    short determineFlipCode(void)const;
+
 
 private slots:
     void on_actionOpen_Image_triggered();
@@ -38,20 +43,36 @@ private slots:
     void DisplayInputImage(); // function to display input image in input label
     void DisplayOutputImage(); // function to display output image in output label
 
-    void on_AddTechnique_clicked();
-
     void on_actionOpen_Video_triggered();
     void on_actionOpen_Livestream_triggered();
 
-    void UpdateListWidget();
 
     void on_PauseTimer_clicked();
     void on_RestartTimer_clicked();
 
-    void on_sp_noiselevel_valueChanged(int value);
+
+    void on_AddMorphologyErode_clicked();
+
+    void morphologyErodeParamChanged();
+
+    void on_AddFlipImage_clicked();
+
+    void flipImageParamChanged();
+
+    void on_AddSaltAndPepper_clicked();
+    void saltAndPepperParamChanged();
 
 signals:
-    void updateSaltAndPepper(int, double);
+    void s_addSaltandPepper(const double&);
+    void updateSaltAndPepper(const int&, const double&);
+
+    void s_addMorphologyErode(int, int);
+    void updateMorphologyErode(int, int, int);
+
+    void s_addFlipImage(const short int);
+    void updateFlipImage(const int&, const short int&);
+
+
 };
 
 #endif // IMAGO_H

@@ -40,8 +40,8 @@ SOURCES += main.cpp\
     flipimage.cpp \
     processmanager.cpp \
     saltandpepper.cpp \
-    convertcolorspace.cpp \
-    histogramequalize.cpp
+    histogramequalize.cpp \
+    morphologyerode.cpp
 
 HEADERS  += imago.h \
     iprocesstechnique.h \
@@ -49,8 +49,8 @@ HEADERS  += imago.h \
     processmanager.h \
     allalgorithms.h \
     saltandpepper.h \
-    convertcolorspace.h \
-    histogramequalize.h
+    histogramequalize.h \
+    morphologyerode.h
 
 FORMS    += imago.ui
 

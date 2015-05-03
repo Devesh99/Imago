@@ -28,7 +28,6 @@ private:
     QImage ipQImage;
     QImage opQImage;
 
-    std::vector<std::string> techniquesList; // stores names of all available techniques (for display in combo box)
 
     // Video/live stream member attributes
     QTimer *timer;
@@ -67,7 +66,7 @@ public:
     // --------------------------
     // accessor for techniqueslist
     // --------------------------
-    const std::vector<std::string> getTechniquesList(void)const;
+
 
 
     // --------------------------
@@ -93,13 +92,21 @@ private slots:
     void ReadFrame();
 
     // Algorithm instance mutators
+    void addSaltAndPepper(const double&);
     void updateSaltAndPepperParams(const int&, const double&);
+
+    // Morphology erode
+    void addMorphologyErode(const int&, const int&); // add to process flow
+    void updateMorphologyErodeParams(const int &, const int&, const int&); // mutator
+
+    // Flip image
+    void addFlipImage(const short int&);
+    void updateFlipImageParams(const int&, const short int&);
 
 signals:
     void ImageReadyInput(); // to display input image
     void ImageReadyOutput(); // to display output image
 
-    void UpdateListWidgetSignal(); // to display the selected technique in the process flow list widget
 
 };
 

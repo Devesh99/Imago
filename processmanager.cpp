@@ -6,11 +6,6 @@
 
 processmanager::processmanager()
 {
-    // creating a vector of string to store the names of the techniques
-    const char* strarray[] = {"flip image", "salt and pepper", "histogram equalize"};
-    std::vector<std::string> strvector(strarray, strarray + sizeof(strarray)/sizeof(strarray[0])); // [1]
-    techniquesList = strvector;
-
     QObject::connect(this, SIGNAL(ImageReadyInput()), this, SLOT(process())); // this way, opening a new image/video/live stream continues the defined process flow processing for the new frame(s) as well, as process is called
 
     framedelay = 0; // error-handling: otherwise garbage value. (though handlers set timer framedelay anyway, so not necessarily required)
@@ -117,43 +112,46 @@ QImage processmanager::getOutputImageQImage()const{
 
 
 // --------------------------
-// Accessor for techniquesList
-// --------------------------
-const std::vector<std::string> processmanager::getTechniquesList(void)const{
-    return techniquesList;
-}
-
-
-// --------------------------
 // Add/remove process technique
 // --------------------------
-void processmanager::addProcessTechnique(const int &indx){
-    Iprocesstechnique* pt;
-    switch(indx){
-    case 0:
-        pt = new flipimage;
-        break;
-    case 1:
-        pt = new saltandpepper;
-        break;
-    case 2:
-        pt = new histogramequalize;
-        break;
-    }
 
+void processmanager::addSaltAndPepper(const double &d){
+    Iprocesstechnique* pt = new saltandpepper(d);
     processtechniquesList.push_back(pt);
 
     process();
-
-    emit UpdateListWidgetSignal();
 }
-
 
 void processmanager::updateSaltAndPepperParams(const int& indx, const double& d){
     dynamic_cast<saltandpepper*>(processtechniquesList[indx])->setParams(d);
     process();
 }
 
+
+void processmanager::addMorphologyErode(const int &val1, const int &val2){
+    Iprocesstechnique* pt = new morphologyerode(val1, val2);
+    processtechniquesList.push_back(pt);
+
+    process();
+}
+
+void processmanager::updateMorphologyErodeParams(const int& indx, const int &val1, const int &val2){
+    dynamic_cast<morphologyerode*>(processtechniquesList[indx])->setParams(val1, val2);
+    process();
+}
+
+
+void processmanager::addFlipImage(const short &flipcode){
+    Iprocesstechnique* pt = new flipimage(flipcode);
+    processtechniquesList.push_back(pt);
+
+    process();
+}
+
+void processmanager::updateFlipImageParams(const int & indx, const short int &flipcode){
+    dynamic_cast<flipimage*>(processtechniquesList[indx])->setParams(flipcode);
+    process();
+}
 
 // --------------------------
 // Process function

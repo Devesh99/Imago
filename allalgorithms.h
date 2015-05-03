@@ -5,7 +5,7 @@
 // included in controller class - processingmanager.h
 #include "flipimage.h"
 #include "saltandpepper.h"
-//#include "convertcolorspace.h"
 #include "histogramequalize.h"
+#include "morphologyerode.h"
 
 #endif // ALLALGORITHMS_H

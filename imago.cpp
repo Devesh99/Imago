@@ -18,23 +18,12 @@ Imago::Imago(QWidget *parent) :
     // --------------------------
     // Signals/slots
     //---------------------------
-
-    // connecting display input signal from process manager(controller) with slot
-    QObject::connect(controller, SIGNAL(ImageReadyInput()), this, SLOT(DisplayInputImage()));
-    QObject::connect(controller, SIGNAL(ImageReadyOutput()), this, SLOT(DisplayOutputImage()));
-
-    // After add technique, display in list widget
-    QObject::connect(controller, SIGNAL(UpdateListWidgetSignal()), this, SLOT(UpdateListWidget()));
-
-    // Algorithm function mutators
-    QObject::connect(this, SIGNAL(updateSaltAndPepper(int,double)), controller, SLOT(updateSaltAndPepperParams(int,double)));
+    initializeConnections();
 
     // --------------------------
     // Initialization function calls
     // --------------------------
 
-    // show list of techniques available in combo box upon start up
-    updateComboBox();
 
     // set default input image (from resource file)
     initializeDefaultInputImage();
@@ -49,15 +38,27 @@ Imago::~Imago()
     delete ui;
 }
 
+void Imago::initializeConnections(void)const{
+    // connecting display input signal from process manager(controller) with slot
+    QObject::connect(controller, SIGNAL(ImageReadyInput()), this, SLOT(DisplayInputImage()));
+    QObject::connect(controller, SIGNAL(ImageReadyOutput()), this, SLOT(DisplayOutputImage()));
 
-void Imago::updateComboBox(void)const{
-    // updates the combo box with list of techniques available upon start up
 
-    std::vector<std::string> v = controller->getTechniquesList(); // temporary vector to store accessed conotrller member
-    std::vector<std::string>::iterator it;
-    for (it = v.begin(); it!=v.end();it++){
-        ui->AddTechniquesComboBox->addItem(QString::fromStdString(*it)); // conversion to qstring required
-    }
+    // Algorithm function mutators
+    QObject::connect(this, SIGNAL(s_addSaltandPepper(const double&)), controller, SLOT(addSaltAndPepper(const double&)));
+    QObject::connect(ui->sp_noiselevel, SIGNAL(valueChanged(int)), this, SLOT(saltAndPepperParamChanged()));
+    QObject::connect(this, SIGNAL(updateSaltAndPepper(const int&, const double&)), controller, SLOT(updateSaltAndPepperParams(const int&, const double&)));
+
+    QObject::connect(this, SIGNAL(s_addMorphologyErode(int,int)), controller, SLOT(addMorphologyErode(int,int)));
+    QObject::connect(ui->MorphologySE, SIGNAL(currentIndexChanged(int)), this, SLOT(morphologyErodeParamChanged()));
+    QObject::connect(ui->MorphologySESize, SIGNAL(valueChanged(int)), this, SLOT(morphologyErodeParamChanged()));
+    QObject::connect(this, SIGNAL(updateMorphologyErode(int, int,int)), controller, SLOT(updateMorphologyErodeParams(int,int,int)));
+
+    QObject::connect(this, SIGNAL(s_addFlipImage(const short int)), controller, SLOT(addFlipImage(const short int)));
+    QObject::connect(ui->flipHorizontal, SIGNAL(clicked()), this, SLOT(flipImageParamChanged()));
+    QObject::connect(ui->flipVertical, SIGNAL(clicked()), this, SLOT(flipImageParamChanged()));
+    QObject::connect(ui->flipBoth, SIGNAL(clicked()), this, SLOT(flipImageParamChanged()));
+    QObject::connect(this, SIGNAL(updateFlipImage(const int&,const short int&)), controller, SLOT(updateFlipImageParams(const int&,const short int&)));
 }
 
 void Imago::initializeDefaultInputImage(void)const{
@@ -71,6 +72,17 @@ void Imago::initializeDefaultInputImage(void)const{
 void Imago::setRanges(void){
     // salt and pepper
     ui->sp_noiselevel->setRange(0,100); // noise level slider
+
+    // creating a vector of string to store the names of the techniques
+    const char* strarray[] = {"Rectangle", "Cross", "Ellipse"};
+    std::vector<std::string> v(strarray, strarray + sizeof(strarray)/sizeof(strarray[0])); // [1]
+    std::vector<std::string>::iterator it;
+    for (it = v.begin(); it!=v.end();it++){
+        ui->MorphologySE->addItem(QString::fromStdString(*it)); // conversion to qstring required
+    }
+
+    ui->MorphologySESize->setRange(3,15);
+    ui->MorphologySESize->setSingleStep(2);
 }
 
 
@@ -128,17 +140,11 @@ void Imago::DisplayOutputImage(){
 }
 
 
-void Imago::on_AddTechnique_clicked()
-{
-    controller->addProcessTechnique(ui->AddTechniquesComboBox->currentIndex());
-}
 
-
-void Imago::UpdateListWidget(){
-    ui->techniquesListWidget->addItem(ui->AddTechniquesComboBox->currentText()); // algorithm name
+void Imago::UpdateListWidget(std::string str){
+    ui->techniquesListWidget->addItem(QString::fromStdString(str)); // algorithm name
     ui->techniquesListWidget->setCurrentRow(ui->techniquesListWidget->count() - 1); // setting added technique as current item
 }
-
 
 void Imago::on_PauseTimer_clicked()
 {
@@ -151,11 +157,55 @@ void Imago::on_RestartTimer_clicked()
 }
 
 
-void Imago::on_sp_noiselevel_valueChanged(int value)
+void Imago::on_AddSaltAndPepper_clicked()
 {
+    emit s_addSaltandPepper(static_cast<double>(ui->sp_noiselevel->value()));
+    UpdateListWidget("salt and pepper");
+}
+
+void Imago::saltAndPepperParamChanged(void){
     if (ui->techniquesListWidget->currentRow() > -1){ // -1 if no item is selected (intialized like this)
         if (ui->techniquesListWidget->currentItem()->text().toStdString().compare("salt and pepper") == 0){
-            emit updateSaltAndPepper(ui->techniquesListWidget->currentRow(), static_cast<double>(value/100.0));
+            emit updateSaltAndPepper(ui->techniquesListWidget->currentRow(), static_cast<double>(ui->sp_noiselevel->value()/100.0));
         }
     }
 }
+
+
+void Imago::on_AddMorphologyErode_clicked()
+{
+    emit s_addMorphologyErode(ui->MorphologySE->currentIndex(), ui->MorphologySESize->value());
+    UpdateListWidget("morphology erode");
+}
+
+void Imago::morphologyErodeParamChanged(){
+    if (ui->techniquesListWidget->currentRow() > -1){ // -1 if no item is selected (intialized like this)
+        if (ui->techniquesListWidget->currentItem()->text().toStdString().compare("morphology erode") == 0){
+            emit updateMorphologyErode(ui->techniquesListWidget->currentRow(), ui->MorphologySE->currentIndex(), ui->MorphologySESize->value());
+        }
+    }
+}
+
+
+void Imago::on_AddFlipImage_clicked()
+{
+    short flipcode = determineFlipCode();
+    emit s_addFlipImage(flipcode);
+    UpdateListWidget("flip image");
+}
+
+short Imago::determineFlipCode(void)const{
+    if (ui->flipHorizontal->isChecked()) return 1;
+    if (ui->flipVertical->isChecked()) return 0;
+    if (ui->flipBoth->isChecked()) return -1;
+}
+
+void Imago::flipImageParamChanged(){
+    if (ui->techniquesListWidget->currentRow() > -1){ // -1 if no item is selected (intialized like this)
+        if (ui->techniquesListWidget->currentItem()->text().toStdString().compare("flip image") == 0){
+            emit updateFlipImage(ui->techniquesListWidget->currentRow(), determineFlipCode());
+        }
+    }
+}
+
+
