@@ -153,6 +153,28 @@ void processmanager::updateFlipImageParams(const int & indx, const short int &fl
     process();
 }
 
+// move process in process flow
+void processmanager::moveProcessTechnique(const int &indx1, const int &indx2){
+    Iprocesstechnique* pt = processtechniquesList[indx1];
+    processtechniquesList[indx1] = processtechniquesList[indx2];
+    processtechniquesList[indx2] = pt;
+
+    process();
+}
+
+void processmanager::removeProcessTechnique(const int &indx){
+    processtechniquesList.erase(processtechniquesList.begin() + indx);
+    process();
+}
+
+void processmanager::refreshProcessTechnique(void){
+    if (!processtechniquesList.empty()){
+        processtechniquesList.clear();
+
+        process();
+    }
+}
+
 // --------------------------
 // Process function
 // --------------------------

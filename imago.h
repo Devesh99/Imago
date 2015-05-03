@@ -32,7 +32,11 @@ private:
 
     void setRanges(void);
 
-    void UpdateListWidget(std::string);
+    void UpdateListWidget(QString);
+    void UpdateListWidgetCurr(QString);
+    void UpdateListWidgetMove(const int&, const int&);
+    void UpdateListWidgetRemove(const int&);
+    void UpdateListWidgetRefresh();
 
     short determineFlipCode(void)const;
 
@@ -61,6 +65,14 @@ private slots:
 
     void on_AddSaltAndPepper_clicked();
     void saltAndPepperParamChanged();
+
+    void on_moveProcessDown_clicked();
+
+    void on_moveProcessUp_clicked();
+
+    void on_removeProcess_clicked();
+
+    void on_refreshProcess_clicked();
 
 signals:
     void s_addSaltandPepper(const double&);

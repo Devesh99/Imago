@@ -70,9 +70,12 @@ public:
 
 
     // --------------------------
-    // Add/remove processing techniques
+    // Add/move/remove processing techniques
     // --------------------------
     void addProcessTechnique(const int&);
+    void moveProcessTechnique(const int&, const int&);
+    void removeProcessTechnique(const int&);
+    void refreshProcessTechnique(void);
 
     // --------------------------
     // Image/Video/live stream handlers
@@ -83,6 +86,7 @@ public:
 
     void pauseTimer(void);
     void restartTimer(void);
+
 
 private slots:
     // Execute process

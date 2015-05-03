@@ -50,7 +50,8 @@ HEADERS  += imago.h \
     allalgorithms.h \
     saltandpepper.h \
     histogramequalize.h \
-    morphologyerode.h
+    morphologyerode.h \
+    stringsglobals.h
 
 FORMS    += imago.ui
 

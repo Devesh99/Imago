@@ -4,7 +4,8 @@
 #include <iostream>
 #include <QFileDialog>
 
-using namespace std;
+#include "stringsglobals.h"
+
 
 Imago::Imago(QWidget *parent) :
     QMainWindow(parent),
@@ -70,10 +71,26 @@ void Imago::initializeDefaultInputImage(void)const{
 }
 
 void Imago::setRanges(void){
+    int iconSize = 31;
+    ui->moveProcessUp->setIcon(QIcon(QPixmap("/Users/Devesh/Documents/MSCV/BSCV/Semester2/C++/Project/images/icon_arrow_up.png")));
+    ui->moveProcessUp->setIconSize(QSize(iconSize, iconSize));
+    ui->moveProcessDown->setIcon(QIcon(QPixmap("/Users/Devesh/Documents/MSCV/BSCV/Semester2/C++/Project/images/icon_arrow_down.png")));
+    ui->moveProcessDown->setIconSize(QSize(iconSize, iconSize));
+    ui->removeProcess->setIcon(QIcon(QPixmap("/Users/Devesh/Documents/MSCV/BSCV/Semester2/C++/Project/images/icon_delete.png")));
+    ui->removeProcess->setIconSize(QSize(iconSize, iconSize));
+    ui->refreshProcess->setIcon(QIcon(QPixmap("/Users/Devesh/Documents/MSCV/BSCV/Semester2/C++/Project/images/icon_refresh.png")));
+    ui->refreshProcess->setIconSize(QSize(iconSize, iconSize));
+
+
+//    QPixmap pix("/Users/Devesh/Documents/MSCV/BSCV/Semester2/C++/Project/images/icon_delete.png");
+//    QIcon icon(pix);
+//    ui->removeProcess->setIcon(icon);
+//    ui->removeProcess->setIconSize(pix.size());
+
     // salt and pepper
     ui->sp_noiselevel->setRange(0,100); // noise level slider
 
-    // creating a vector of string to store the names of the techniques
+    // morphology structuring element shape
     const char* strarray[] = {"Rectangle", "Cross", "Ellipse"};
     std::vector<std::string> v(strarray, strarray + sizeof(strarray)/sizeof(strarray[0])); // [1]
     std::vector<std::string>::iterator it;
@@ -83,6 +100,9 @@ void Imago::setRanges(void){
 
     ui->MorphologySESize->setRange(3,15);
     ui->MorphologySESize->setSingleStep(2);
+
+    // flip image default method
+    ui->flipVertical->setChecked(true);
 }
 
 
@@ -90,6 +110,7 @@ void Imago::on_actionOpen_Image_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), ".",tr("Image files(*.png *.jpg *.bmp"));
     // error-handling: empty filename (eg: user press cancel)
+    // allows current process to continue executing (consider live stream/video) if open image is clicked followed by cancel
     if (!fileName.isEmpty()){
         controller->loadImage(fileName.toStdString());
     }
@@ -141,10 +162,33 @@ void Imago::DisplayOutputImage(){
 
 
 
-void Imago::UpdateListWidget(std::string str){
-    ui->techniquesListWidget->addItem(QString::fromStdString(str)); // algorithm name
+void Imago::UpdateListWidget(QString str){
+    ui->techniquesListWidget->addItem(str); // algorithm name
     ui->techniquesListWidget->setCurrentRow(ui->techniquesListWidget->count() - 1); // setting added technique as current item
 }
+
+void Imago::UpdateListWidgetCurr(QString str){
+    ui->techniquesListWidget->currentItem()->setText(str);
+}
+
+void Imago::UpdateListWidgetMove(const int &indx1, const int &indx2){
+    QString str(ui->techniquesListWidget->item(indx1)->text());
+    ui->techniquesListWidget->item(indx1)->setText(ui->techniquesListWidget->item(indx2)->text());
+    ui->techniquesListWidget->item(indx2)->setText(str);
+    ui->techniquesListWidget->setCurrentRow(indx2);
+}
+
+void Imago::UpdateListWidgetRemove(const int &indx){
+//    delete ui->techniquesListWidget->item(indx);
+    QListWidgetItem* it = ui->techniquesListWidget->takeItem(indx);
+    delete it;
+}
+
+void Imago::UpdateListWidgetRefresh(void){
+    ui->techniquesListWidget->clear();
+}
+
+
 
 void Imago::on_PauseTimer_clicked()
 {
@@ -159,14 +203,15 @@ void Imago::on_RestartTimer_clicked()
 
 void Imago::on_AddSaltAndPepper_clicked()
 {
-    emit s_addSaltandPepper(static_cast<double>(ui->sp_noiselevel->value()));
-    UpdateListWidget("salt and pepper");
+    emit s_addSaltandPepper(static_cast<double>(ui->sp_noiselevel->value()/100.0));
+    UpdateListWidget(salt_and_pepper + "(" + QString::number(ui->sp_noiselevel->value()/100.0) + ")");
 }
 
 void Imago::saltAndPepperParamChanged(void){
     if (ui->techniquesListWidget->currentRow() > -1){ // -1 if no item is selected (intialized like this)
-        if (ui->techniquesListWidget->currentItem()->text().toStdString().compare("salt and pepper") == 0){
+        if (ui->techniquesListWidget->currentItem()->text().contains(salt_and_pepper)){
             emit updateSaltAndPepper(ui->techniquesListWidget->currentRow(), static_cast<double>(ui->sp_noiselevel->value()/100.0));
+            UpdateListWidgetCurr(salt_and_pepper + "(" + QString::number(ui->sp_noiselevel->value()/100.0) + ")");
         }
     }
 }
@@ -175,13 +220,14 @@ void Imago::saltAndPepperParamChanged(void){
 void Imago::on_AddMorphologyErode_clicked()
 {
     emit s_addMorphologyErode(ui->MorphologySE->currentIndex(), ui->MorphologySESize->value());
-    UpdateListWidget("morphology erode");
+    UpdateListWidget(morphology_erode + " (" + ui->MorphologySE->currentText() + ", " + QString::number(ui->MorphologySESize->value()) + ")");
 }
 
 void Imago::morphologyErodeParamChanged(){
     if (ui->techniquesListWidget->currentRow() > -1){ // -1 if no item is selected (intialized like this)
-        if (ui->techniquesListWidget->currentItem()->text().toStdString().compare("morphology erode") == 0){
+        if (ui->techniquesListWidget->currentItem()->text().contains(morphology_erode)){
             emit updateMorphologyErode(ui->techniquesListWidget->currentRow(), ui->MorphologySE->currentIndex(), ui->MorphologySESize->value());
+            UpdateListWidgetCurr(morphology_erode + " (" + ui->MorphologySE->currentText() + ", " + QString::number(ui->MorphologySESize->value()) + ")");
         }
     }
 }
@@ -191,21 +237,60 @@ void Imago::on_AddFlipImage_clicked()
 {
     short flipcode = determineFlipCode();
     emit s_addFlipImage(flipcode);
-    UpdateListWidget("flip image");
+    UpdateListWidget(flip_image + " (" + QString::number(flipcode) + ")");
 }
 
 short Imago::determineFlipCode(void)const{
     if (ui->flipHorizontal->isChecked()) return 1;
     if (ui->flipVertical->isChecked()) return 0;
     if (ui->flipBoth->isChecked()) return -1;
+    return 0;
 }
 
 void Imago::flipImageParamChanged(){
     if (ui->techniquesListWidget->currentRow() > -1){ // -1 if no item is selected (intialized like this)
-        if (ui->techniquesListWidget->currentItem()->text().toStdString().compare("flip image") == 0){
-            emit updateFlipImage(ui->techniquesListWidget->currentRow(), determineFlipCode());
+        if (ui->techniquesListWidget->currentItem()->text().contains(flip_image)){
+            short flipcode = determineFlipCode();
+            emit updateFlipImage(ui->techniquesListWidget->currentRow(), flipcode);
+            UpdateListWidgetCurr(flip_image + " (" + QString::number(flipcode) + ")");
         }
     }
 }
 
 
+
+void Imago::on_moveProcessUp_clicked()
+{
+    int currRow = ui->techniquesListWidget->currentRow();
+    if (currRow>0){
+        controller->moveProcessTechnique(currRow, currRow - 1);
+        UpdateListWidgetMove(currRow, currRow - 1);
+    }
+}
+
+void Imago::on_moveProcessDown_clicked()
+{
+    int currRow = ui->techniquesListWidget->currentRow();
+    if (currRow < (ui->techniquesListWidget->count() - 1)){
+        controller->moveProcessTechnique(currRow, currRow + 1);
+        UpdateListWidgetMove(currRow, currRow + 1);
+    }
+}
+
+
+void Imago::on_removeProcess_clicked()
+{
+    int currRow = ui->techniquesListWidget->currentRow();
+    if (currRow > -1){
+        controller->removeProcessTechnique(currRow);
+        UpdateListWidgetRemove(currRow);
+    }
+}
+
+void Imago::on_refreshProcess_clicked()
+{
+    if (ui->techniquesListWidget->count()>0){
+        controller->refreshProcessTechnique();
+        UpdateListWidgetRefresh();
+    }
+}
