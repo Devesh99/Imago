@@ -54,10 +54,8 @@ private slots:
     void on_PauseTimer_clicked();
     void on_RestartTimer_clicked();
 
-
-    void on_AddMorphologyErode_clicked();
-
-    void morphologyErodeParamChanged();
+    void on_AddMorphologyOperation_clicked();
+    void morphologyOperationParamChanged(void);
 
     void on_AddFlipImage_clicked();
 
@@ -74,17 +72,25 @@ private slots:
 
     void on_refreshProcess_clicked();
 
+    void on_AdEqualizeHistogram_clicked();
+
+    void on_AddLowPassFilter_clicked();
+    void lowPassFilterParamChanged(void);
+
 signals:
     void s_addSaltandPepper(const double&);
     void updateSaltAndPepper(const int&, const double&);
 
-    void s_addMorphologyErode(int, int);
-    void updateMorphologyErode(int, int, int);
+    void s_addMorphologyOperation(const int&, const int&, const int&);
+    void updateMorphologyOperation(const int&, const int&, const int&, const int&);
 
     void s_addFlipImage(const short int);
     void updateFlipImage(const int&, const short int&);
 
+    void s_addHistogramEqualize();
 
+    void s_addLowPassFilter(const int&, const int&);
+    void updateLowPassFilter(const int&, const int&, const int&);
 };
 
 #endif // IMAGO_H

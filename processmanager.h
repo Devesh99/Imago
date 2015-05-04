@@ -2,7 +2,7 @@
 #define PROCESSMANAGER_H
 
 #include "iprocesstechnique.h"
-#include "allalgorithms.h"
+#include "allalgorithms.h" // to be able to instantiate objects of each algorithm (mutators through dynamic casting)
 
 #include <QObject>
 #include <QImage>
@@ -64,15 +64,8 @@ public:
 
 
     // --------------------------
-    // accessor for techniqueslist
+    // Add/move/remove/refresh processing techniques
     // --------------------------
-
-
-
-    // --------------------------
-    // Add/move/remove processing techniques
-    // --------------------------
-    void addProcessTechnique(const int&);
     void moveProcessTechnique(const int&, const int&);
     void removeProcessTechnique(const int&);
     void refreshProcessTechnique(void);
@@ -95,23 +88,32 @@ private slots:
     // Read frame from video/live stream
     void ReadFrame();
 
-    // Algorithm instance mutators
+    // --------------------------
+    // Algorithm instance + mutators
+    // --------------------------
+    // mutators: first parameter is index of instance in process vector
+
+    // Salt and pepper noise
     void addSaltAndPepper(const double&);
     void updateSaltAndPepperParams(const int&, const double&);
 
     // Morphology erode
-    void addMorphologyErode(const int&, const int&); // add to process flow
-    void updateMorphologyErodeParams(const int &, const int&, const int&); // mutator
+    void addMorphologyOperation(const int&, const int&, const int&); // add to process flow
+    void updateMorphologyOperationParams(const int&, const int &, const int&, const int&); // mutator
+
+    void addLowPassFilter(const int&, const int&);
+    void updateLowPassFilter(const int&, const int&, const int&);
 
     // Flip image
     void addFlipImage(const short int&);
     void updateFlipImageParams(const int&, const short int&);
 
+    // Equalize Histogram
+    void addEqualizeHistogram(void);
+
 signals:
     void ImageReadyInput(); // to display input image
     void ImageReadyOutput(); // to display output image
-
-
 };
 
 #endif // PROCESSMANAGER_H

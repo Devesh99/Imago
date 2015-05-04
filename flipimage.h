@@ -21,6 +21,7 @@ public:
     // virtual process function definition
     void process(cv::Mat&, cv::Mat&); // not virtual since would not be derived further
 
+    // mutator (independent from base class)
     void setParams(const short int&);
 };
 

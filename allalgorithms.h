@@ -6,6 +6,7 @@
 #include "flipimage.h"
 #include "saltandpepper.h"
 #include "histogramequalize.h"
-#include "morphologyerode.h"
+#include "morphologyoperation.h"
+#include "lowpassfilter.h"
 
 #endif // ALLALGORITHMS_H

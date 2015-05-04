@@ -112,7 +112,7 @@ QImage processmanager::getOutputImageQImage()const{
 
 
 // --------------------------
-// Add/remove process technique
+// Algorithm instance + mutators
 // --------------------------
 
 void processmanager::addSaltAndPepper(const double &d){
@@ -128,15 +128,27 @@ void processmanager::updateSaltAndPepperParams(const int& indx, const double& d)
 }
 
 
-void processmanager::addMorphologyErode(const int &val1, const int &val2){
-    Iprocesstechnique* pt = new morphologyerode(val1, val2);
+void processmanager::addMorphologyOperation(const int &val1, const int &val2, const int& val3){
+    Iprocesstechnique* pt = new morphologyoperation(val1, val2, val3);
     processtechniquesList.push_back(pt);
 
     process();
 }
 
-void processmanager::updateMorphologyErodeParams(const int& indx, const int &val1, const int &val2){
-    dynamic_cast<morphologyerode*>(processtechniquesList[indx])->setParams(val1, val2);
+void processmanager::updateMorphologyOperationParams(const int& indx, const int &val1, const int &val2, const int&val3){
+    dynamic_cast<morphologyoperation *>(processtechniquesList[indx])->setParams(val1, val2, val3);
+    process();
+}
+
+void processmanager::addLowPassFilter(const int & f, const int & fs){
+    Iprocesstechnique* pt = new lowpassfilter(f, fs);
+    processtechniquesList.push_back(pt);
+
+    process();
+}
+
+void processmanager::updateLowPassFilter(const int &indx, const int &f, const int &fs){
+    dynamic_cast<lowpassfilter*>(processtechniquesList[indx])->setParams(f, fs);
     process();
 }
 
@@ -153,6 +165,18 @@ void processmanager::updateFlipImageParams(const int & indx, const short int &fl
     process();
 }
 
+
+void processmanager::addEqualizeHistogram(void){
+    Iprocesstechnique* pt = new histogramequalize;
+    processtechniquesList.push_back(pt);
+
+    process();
+}
+
+// --------------------------
+// move/remove/refresh process technique
+// --------------------------
+
 // move process in process flow
 void processmanager::moveProcessTechnique(const int &indx1, const int &indx2){
     Iprocesstechnique* pt = processtechniquesList[indx1];
@@ -162,11 +186,13 @@ void processmanager::moveProcessTechnique(const int &indx1, const int &indx2){
     process();
 }
 
+// remove current item
 void processmanager::removeProcessTechnique(const int &indx){
     processtechniquesList.erase(processtechniquesList.begin() + indx);
     process();
 }
 
+// clear entire process list
 void processmanager::refreshProcessTechnique(void){
     if (!processtechniquesList.empty()){
         processtechniquesList.clear();

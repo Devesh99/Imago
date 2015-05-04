@@ -41,7 +41,8 @@ SOURCES += main.cpp\
     processmanager.cpp \
     saltandpepper.cpp \
     histogramequalize.cpp \
-    morphologyerode.cpp
+    morphologyoperation.cpp \
+    lowpassfilter.cpp
 
 HEADERS  += imago.h \
     iprocesstechnique.h \
@@ -50,8 +51,9 @@ HEADERS  += imago.h \
     allalgorithms.h \
     saltandpepper.h \
     histogramequalize.h \
-    morphologyerode.h \
-    stringsglobals.h
+    stringsglobals.h \
+    morphologyoperation.h \
+    lowpassfilter.h
 
 FORMS    += imago.ui
 
