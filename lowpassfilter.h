@@ -17,6 +17,9 @@ public:
     void process(cv::Mat &, cv::Mat &);
 
     void setParams(const int&, const int&);
+
+    void setParameters(QString, ...);
+
 };
 
 #endif // LOWPASSFILTER_H

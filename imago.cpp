@@ -46,28 +46,21 @@ void Imago::initializeConnections(void)const{
 
 
     // Algorithm function mutators
-    QObject::connect(this, SIGNAL(s_addSaltandPepper(const double&)), controller, SLOT(addSaltAndPepper(const double&)));
-    QObject::connect(ui->sp_noiselevel, SIGNAL(valueChanged(int)), this, SLOT(saltAndPepperParamChanged()));
-    QObject::connect(this, SIGNAL(updateSaltAndPepper(const int&, const double&)), controller, SLOT(updateSaltAndPepperParams(const int&, const double&)));
 
-    QObject::connect(this, SIGNAL(s_addMorphologyOperation(const int&, const int&, const int&)), controller, SLOT(addMorphologyOperation(const int&, const int&, const int&)));
-    QObject::connect(ui->MorphologySE, SIGNAL(currentIndexChanged(int)), this, SLOT(morphologyOperationParamChanged()));
-    QObject::connect(ui->MorphologySESize, SIGNAL(valueChanged(int)), this, SLOT(morphologyOperationParamChanged()));
-    QObject::connect(ui->MorphologyOperation, SIGNAL(currentIndexChanged(int)), this, SLOT(morphologyOperationParamChanged()));
-    QObject::connect(this, SIGNAL(updateMorphologyOperation(const int&, const int&, const int&, const int&)), controller, SLOT(updateMorphologyOperationParams(const int&, const int&, const int&, const int&)));
+    QObject::connect(ui->sp_noiselevel, SIGNAL(valueChanged(int)), this, SLOT(paramChanged()));
 
-    QObject::connect(this, SIGNAL(s_addLowPassFilter(const int&, const int&)), controller, SLOT(addLowPassFilter(const int&, const int&)));
-    QObject::connect(ui->LowPassFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(lowPassFilterParamChanged()));
-    QObject::connect(ui->LowPassFilterSize, SIGNAL(valueChanged(int)), this, SLOT(lowPassFilterParamChanged()));
-    QObject::connect(this, SIGNAL(updateLowPassFilter(const int&, const int&, const int&)), controller, SLOT(updateLowPassFilter(const int&, const int&, const int&)));
+    QObject::connect(ui->MorphologySE, SIGNAL(currentIndexChanged(int)), this, SLOT(paramChanged()));
+    QObject::connect(ui->MorphologySESize, SIGNAL(valueChanged(int)), this, SLOT(paramChanged()));
+    QObject::connect(ui->MorphologyOperation, SIGNAL(currentIndexChanged(int)), this, SLOT(paramChanged()));
 
-    QObject::connect(this, SIGNAL(s_addFlipImage(const short int)), controller, SLOT(addFlipImage(const short int)));
-    QObject::connect(ui->flipHorizontal, SIGNAL(clicked()), this, SLOT(flipImageParamChanged()));
-    QObject::connect(ui->flipVertical, SIGNAL(clicked()), this, SLOT(flipImageParamChanged()));
-    QObject::connect(ui->flipBoth, SIGNAL(clicked()), this, SLOT(flipImageParamChanged()));
-    QObject::connect(this, SIGNAL(updateFlipImage(const int&,const short int&)), controller, SLOT(updateFlipImageParams(const int&,const short int&)));
+    QObject::connect(ui->LowPassFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(paramChanged()));
+    QObject::connect(ui->LowPassFilterSize, SIGNAL(valueChanged(int)), this, SLOT(paramChanged()));
 
-    QObject::connect(this, SIGNAL(s_addHistogramEqualize()), controller, SLOT(addEqualizeHistogram()));
+    QObject::connect(ui->flipHorizontal, SIGNAL(clicked()), this, SLOT(paramChanged()));
+    QObject::connect(ui->flipVertical, SIGNAL(clicked()), this, SLOT(paramChanged()));
+    QObject::connect(ui->flipBoth, SIGNAL(clicked()), this, SLOT(paramChanged()));
+
+    QObject::connect(ui->sliderCanny, SIGNAL(valueChanged(int)), this, SLOT(paramChanged()));
 }
 
 void Imago::initializeDefaultInputImage(void)const{
@@ -120,6 +113,8 @@ void Imago::setRanges(void){
 
     // salt and pepper
     ui->sp_noiselevel->setRange(0,100); // noise level slider
+    ui->sp_noiselevel->setTickInterval(10); // 0.1 interval between ticks
+    ui->sp_noiselevel->setTickPosition(QSlider::TicksBelow); // ticks below slider
 
     // morphology structuring element shape
     const char* strarray[] = {"Rectangle", "Cross", "Ellipse"};
@@ -155,9 +150,12 @@ void Imago::setRanges(void){
     ui->LowPassFilterSize->setRange(3,15);
     ui->LowPassFilterSize->setSingleStep(2);
 
-
     // flip image default method
     ui->flipVertical->setChecked(true);
+
+    // canny edge detection slider
+    ui->sliderCanny->setRange(0, 100);
+    ui->sliderCanny->setTickPosition(QSlider::TicksBelow);
 }
 
 
@@ -254,56 +252,31 @@ void Imago::on_actionPause_Play_triggered()
 
 void Imago::on_AddSaltAndPepper_clicked()
 {
-    emit s_addSaltandPepper(static_cast<double>(ui->sp_noiselevel->value()/100.0));
-    UpdateListWidget(salt_and_pepper + "(" + QString::number(ui->sp_noiselevel->value()/100.0) + ")");
-}
-
-void Imago::saltAndPepperParamChanged(void){
-    if (ui->techniquesListWidget->currentRow() > -1){ // -1 if no item is selected (intialized like this)
-        if (ui->techniquesListWidget->currentItem()->text().contains(salt_and_pepper)){
-            emit updateSaltAndPepper(ui->techniquesListWidget->currentRow(), static_cast<double>(ui->sp_noiselevel->value()/100.0));
-            UpdateListWidgetCurr(salt_and_pepper + "(" + QString::number(ui->sp_noiselevel->value()/100.0) + ")");
-        }
-    }
+    double nlevel = ui->sp_noiselevel->value()/100.0;
+    controller->AddTechnique(salt_and_pepper, nlevel);
+    UpdateListWidget(salt_and_pepper + "(" + QString::number(nlevel) + ")");
 }
 
 
 void Imago::on_AddMorphologyOperation_clicked()
 {
-    emit s_addMorphologyOperation(ui->MorphologyOperation->currentIndex(), ui->MorphologySE->currentIndex(), ui->MorphologySESize->value());
+    controller->AddTechnique(morphology, ui->MorphologyOperation->currentIndex(), ui->MorphologySE->currentIndex(), ui->MorphologySESize->value());
     UpdateListWidget(morphology_operations[ui->MorphologyOperation->currentIndex()] + " (" + ui->MorphologySE->currentText() + ", " + QString::number(ui->MorphologySESize->value()) + ")");
-}
 
-void Imago::morphologyOperationParamChanged(void){
-    if (ui->techniquesListWidget->currentRow() > -1){ // -1 if no item is selected (intialized like this)
-        if (ui->techniquesListWidget->currentItem()->text().contains(morphology)){
-            emit updateMorphologyOperation(ui->techniquesListWidget->currentRow(), ui->MorphologyOperation->currentIndex(), ui->MorphologySE->currentIndex(), ui->MorphologySESize->value());
-            UpdateListWidgetCurr(morphology_operations[ui->MorphologyOperation->currentIndex()] + " (" + ui->MorphologySE->currentText() + ", " + QString::number(ui->MorphologySESize->value()) + ")");
-        }
-    }
 }
 
 
 void Imago::on_AddLowPassFilter_clicked()
 {
-    emit s_addLowPassFilter(ui->LowPassFilter->currentIndex(), ui->LowPassFilterSize->value());
+    controller->AddTechnique(lpf, ui->LowPassFilter->currentIndex(), ui->LowPassFilterSize->value());
     UpdateListWidget(lpf_operations[ui->LowPassFilter->currentIndex()] + " (" + QString::number(ui->LowPassFilterSize->value()) + ")");
-}
-
-void Imago::lowPassFilterParamChanged(void){
-    if (ui->techniquesListWidget->currentRow() > -1){ // -1 if no item is selected (intialized like this)
-        if (ui->techniquesListWidget->currentItem()->text().contains(lpf)){
-            emit updateLowPassFilter(ui->techniquesListWidget->currentRow(), ui->LowPassFilter->currentIndex(), ui->LowPassFilterSize->value());
-            UpdateListWidgetCurr(lpf_operations[ui->LowPassFilter->currentIndex()] + " (" + QString::number(ui->LowPassFilterSize->value()) + ")");
-        }
-    }
 }
 
 
 void Imago::on_AddFlipImage_clicked()
 {
     short flipcode = determineFlipCode();
-    emit s_addFlipImage(flipcode);
+    controller->AddTechnique(flip_image, flipcode);
     UpdateListWidget(flip_image + " (" + QString::number(flipcode) + ")");
 }
 
@@ -314,24 +287,63 @@ short Imago::determineFlipCode(void)const{
     return 0;
 }
 
-void Imago::flipImageParamChanged(){
-    if (ui->techniquesListWidget->currentRow() > -1){ // -1 if no item is selected (intialized like this)
-        if (ui->techniquesListWidget->currentItem()->text().contains(flip_image)){
-            short flipcode = determineFlipCode();
-            emit updateFlipImage(ui->techniquesListWidget->currentRow(), flipcode);
-            UpdateListWidgetCurr(flip_image + " (" + QString::number(flipcode) + ")");
-        }
-    }
-}
-
 
 void Imago::on_AddEqualizeHistogram_clicked()
 {
-    emit s_addHistogramEqualize();
+    controller->AddTechnique(equalize_hist);
     UpdateListWidget(equalize_hist);
 }
 
+void Imago::on_AddCanny_clicked()
+{
+    controller->AddTechnique(canny, ui->sliderCanny->value());
+    UpdateListWidget(canny + " (" + QString::number(ui->sliderCanny->value()) + ")");
+}
 
+void Imago::paramChanged(){
+    if (ui->techniquesListWidget->currentRow() > -1){ // -1 if no item is selected (intialized like this)
+
+        QString str;
+        QString currString = ui->techniquesListWidget->currentItem()->text();
+        int currRow = ui->techniquesListWidget->currentRow();
+
+        if (currString.contains(flip_image)){
+            short flipcode = determineFlipCode();
+            controller->setParameters(flip_image, currRow, flipcode);
+
+            str = (flip_image + " (" + QString::number(flipcode) + ")");
+        }
+        if (currString.contains(lpf)){
+            int lpfindx = ui->LowPassFilter->currentIndex();
+            int fs = ui->LowPassFilterSize->value();
+            controller->setParameters(lpf, currRow, lpfindx, fs);
+            str = (lpf_operations[lpfindx] + " (" + QString::number(fs) + ")");
+        }
+        if (currString.contains(morphology)){
+            int m_indx = ui->MorphologyOperation->currentIndex();
+            int m_selem = ui->MorphologySE->currentIndex();
+            int m_sesize = ui->MorphologySESize->value();
+            controller->setParameters(morphology, currRow, m_indx, m_selem, m_sesize);
+            str = (morphology_operations[m_indx] + " (" + ui->MorphologySE->currentText() + ", " + QString::number(m_sesize) + ")");
+        }
+        if (currString.contains(salt_and_pepper)){
+            double nlevel = ui->sp_noiselevel->value()/100.0;
+            controller->setParameters(salt_and_pepper, currRow, nlevel);
+            str = (salt_and_pepper + " (" + QString::number(nlevel) + ")");
+        }
+        if (currString.contains(canny)){
+            int thresh = ui->sliderCanny->value();
+            controller->setParameters(canny, currRow, thresh);
+            str = (canny + " (" + QString::number(thresh));
+        }
+        // error handling: since no parameters in histogram equalization, maintain string. (otherwise, would update with empty (default string) in to update call below.
+        if (currString.contains(equalize_hist)){
+            str = currString;
+        }
+
+        UpdateListWidgetCurr(str);
+    }
+}
 
 
 void Imago::on_moveProcessUp_clicked()
@@ -392,3 +404,5 @@ void Imago::on_actionSave_Video_triggered()
 
 
 }
+
+

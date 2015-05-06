@@ -2,7 +2,7 @@
 
 morphologyoperation::morphologyoperation()
 {
-    setParams(0,0,3);
+    setParams(0,0,3); // default: erode, rectangle, 3x3
 }
 
 morphologyoperation::morphologyoperation(const int & val1, const int & val2, const int& val3){
@@ -68,4 +68,18 @@ void morphologyoperation::setParams(const int &val1, const int &val2, const int&
     operation_indx = val1;
     elem_shape = determineElementShape(val2);
     elem_size = val3;
+}
+
+
+void morphologyoperation::setParameters(QString str, ...){
+    va_list args;
+    va_start(args, str);
+
+    int m_indx = va_arg(args, int);
+    int m_seshape = va_arg(args, int);
+    int m_sesize = va_arg(args, int);
+
+    setParams(m_indx, m_seshape, m_sesize);
+
+    va_end(args);
 }

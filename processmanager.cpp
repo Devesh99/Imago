@@ -1,4 +1,5 @@
 #include "processmanager.h"
+#include "stringsglobals.h"
 
 // --------------------------
 // Controller class
@@ -112,66 +113,83 @@ QImage processmanager::getOutputImageQImage()const{
 
 
 // --------------------------
-// Algorithm instance + mutators
+// Algorithm add + mutators
 // --------------------------
+void processmanager::AddTechnique(QString str, ...){
+    va_list args;
+    va_start(args, str);
 
-void processmanager::addSaltAndPepper(const double &d){
-    Iprocesstechnique* pt = new saltandpepper(d);
+    Iprocesstechnique* pt;
+
+    if (str.compare(canny) == 0){
+        int thresh = va_arg(args, int);
+        pt = new cannyedgedetector(thresh);
+    }
+    if (str.compare(morphology) == 0){
+        int m_operation = va_arg(args, int);
+        int m_selem = va_arg(args, int);
+        int m_ssize = va_arg(args, int);
+        pt = new morphologyoperation(m_operation, m_selem, m_ssize);
+    }
+    if (str.compare(flip_image) == 0){
+        int f = va_arg(args, int);
+        short flipcode = static_cast<float>(f);
+        pt = new flipimage(flipcode);
+    }
+    if (str.compare(equalize_hist) == 0){
+        pt = new histogramequalize;
+    }
+    if (str.compare(lpf) == 0){
+        int lpfindx = va_arg(args, int);
+        int fs = va_arg(args, int);
+        pt = new lowpassfilter(lpfindx, fs);
+    }
+    if (str.compare(salt_and_pepper) == 0){
+        pt = new saltandpepper(va_arg(args, double));
+    }
+
     processtechniquesList.push_back(pt);
 
+    va_end(args);
+
+    process();
+
+}
+
+// mutators
+void processmanager::setParameters(QString str, int indx, ...){
+    va_list args;
+    va_start(args, indx);
+
+    if (str.compare(canny) == 0){
+        int thresh = va_arg(args, int);
+        processtechniquesList[indx]->setParameters(str, thresh);
+    }
+    if (str.compare(morphology) == 0){
+        int m_operation = va_arg(args, int);
+        int m_selem = va_arg(args, int);
+        int m_ssize = va_arg(args, int);
+        processtechniquesList[indx]->setParameters(str, m_operation, m_selem, m_ssize);
+    }
+    if (str.compare(flip_image) == 0){
+        int f = va_arg(args, int);
+        short flipcode = static_cast<float>(f);
+        processtechniquesList[indx]->setParameters(str, flipcode);
+    }
+    if (str.compare(lpf) == 0){
+        int lpfindx = va_arg(args, int);
+        int fs = va_arg(args, int);
+        processtechniquesList[indx]->setParameters(str, lpfindx, fs);
+    }
+    if (str.compare(salt_and_pepper) == 0){
+        processtechniquesList[indx]->setParameters(str, va_arg(args, double));
+    }
+
+    va_end(args);
+
     process();
 }
 
-void processmanager::updateSaltAndPepperParams(const int& indx, const double& d){
-    dynamic_cast<saltandpepper*>(processtechniquesList[indx])->setParams(d);
-    process();
-}
-
-
-void processmanager::addMorphologyOperation(const int &val1, const int &val2, const int& val3){
-    Iprocesstechnique* pt = new morphologyoperation(val1, val2, val3);
-    processtechniquesList.push_back(pt);
-
-    process();
-}
-
-void processmanager::updateMorphologyOperationParams(const int& indx, const int &val1, const int &val2, const int&val3){
-    dynamic_cast<morphologyoperation *>(processtechniquesList[indx])->setParams(val1, val2, val3);
-    process();
-}
-
-void processmanager::addLowPassFilter(const int & f, const int & fs){
-    Iprocesstechnique* pt = new lowpassfilter(f, fs);
-    processtechniquesList.push_back(pt);
-
-    process();
-}
-
-void processmanager::updateLowPassFilter(const int &indx, const int &f, const int &fs){
-    dynamic_cast<lowpassfilter*>(processtechniquesList[indx])->setParams(f, fs);
-    process();
-}
-
-
-void processmanager::addFlipImage(const short &flipcode){
-    Iprocesstechnique* pt = new flipimage(flipcode);
-    processtechniquesList.push_back(pt);
-
-    process();
-}
-
-void processmanager::updateFlipImageParams(const int & indx, const short int &flipcode){
-    dynamic_cast<flipimage*>(processtechniquesList[indx])->setParams(flipcode);
-    process();
-}
-
-
-void processmanager::addEqualizeHistogram(void){
-    Iprocesstechnique* pt = new histogramequalize;
-    processtechniquesList.push_back(pt);
-
-    process();
-}
 
 // --------------------------
 // move/remove/refresh process technique
@@ -195,6 +213,7 @@ void processmanager::removeProcessTechnique(const int &indx){
 // clear entire process list
 void processmanager::refreshProcessTechnique(void){
     if (!processtechniquesList.empty()){
+        // error handling: check for empty process flow vector
         processtechniquesList.clear();
 
         process();
@@ -271,6 +290,7 @@ void processmanager::ReadFrame(){
 
 
 void processmanager::pauseplayTimer(void){
+    // integrated functionality for both pause/play as is usually
     if (capture.isOpened()){
         if (timer->isActive()){
             timer->stop();
@@ -301,3 +321,7 @@ void processmanager::setFileNameSave(QString str){
 QString processmanager::getFileNameSave(void)const{
     return fileNameSave;
 }
+
+
+
+

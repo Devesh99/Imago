@@ -20,7 +20,7 @@ saltandpepper::~saltandpepper(){
 
 void saltandpepper::process(cv::Mat &ip, cv::Mat &op){
     int factor=nlevel*ip.cols*ip.rows;
-    salt(ip, op, factor/2);
+    salt(ip, op, factor/2); // noise level distributed equally among salt and pepper
     pepper(ip, op, factor/2);
 }
 
@@ -63,4 +63,13 @@ void saltandpepper::pepper(cv::Mat &ip, cv::Mat &op, int n){
 
 void saltandpepper::setParams(const double &d){
     nlevel = d;
+}
+
+void saltandpepper::setParameters(QString str, ...){
+    va_list args;
+    va_start(args, str);
+
+    setParams(va_arg(args, double));
+
+    va_end(args);
 }

@@ -8,5 +8,6 @@
 #include "histogramequalize.h"
 #include "morphologyoperation.h"
 #include "lowpassfilter.h"
+#include "cannyedgedetector.h"
 
 #endif // ALLALGORITHMS_H

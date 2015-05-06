@@ -2,7 +2,7 @@
 
 lowpassfilter::lowpassfilter()
 {
-    setParams(0, 3);
+    setParams(0, 3); // default: blur, 3x3
 }
 
 lowpassfilter::lowpassfilter(const int& indx, const int &fs){
@@ -38,4 +38,17 @@ void lowpassfilter::process(cv::Mat& ip, cv::Mat& op){
 void lowpassfilter::setParams(const int &indx, const int &fs){
     operation_indx = indx;
     filter_size = fs;
+}
+
+
+void lowpassfilter::setParameters(QString str, ...){
+    va_list(args);
+    va_start(args, str);
+
+    int indx = va_arg(args, int);
+    int fs = va_arg(args, int);
+
+    setParams(indx, fs);
+
+    va_end(args);
 }

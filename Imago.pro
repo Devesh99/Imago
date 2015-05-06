@@ -42,7 +42,9 @@ SOURCES += main.cpp\
     saltandpepper.cpp \
     histogramequalize.cpp \
     morphologyoperation.cpp \
-    lowpassfilter.cpp
+    lowpassfilter.cpp \
+    cannyedgedetector.cpp \
+    stringsglobals.cpp
 
 HEADERS  += imago.h \
     iprocesstechnique.h \
@@ -53,7 +55,8 @@ HEADERS  += imago.h \
     histogramequalize.h \
     stringsglobals.h \
     morphologyoperation.h \
-    lowpassfilter.h
+    lowpassfilter.h \
+    cannyedgedetector.h
 
 FORMS    += imago.ui
 

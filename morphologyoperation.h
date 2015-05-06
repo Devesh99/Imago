@@ -6,9 +6,9 @@
 class morphologyoperation: public Iprocesstechnique
 {
 private:
-    int elem_shape;
-    int elem_size;
-    int operation_indx;
+    int elem_shape; // structuring element shape
+    int elem_size; // SE size
+    int operation_indx; // morphological operation
 public:
     morphologyoperation();
     morphologyoperation(const int&, const int&, const int&);
@@ -20,8 +20,10 @@ public:
     // helper function for process
     int determineElementShape(const int&);
 
-    // mutator (independent from base class)
+    // mutator
     void setParams(const int&, const int&, const int&);
+
+    void setParameters(QString, ...);
 };
 
 #endif // MORPHOLOGYERODE_H

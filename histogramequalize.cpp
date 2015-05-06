@@ -27,3 +27,7 @@ void histogramequalize::process(cv::Mat &ip, cv::Mat &op){
     }
 
 }
+
+void histogramequalize::setParameters(QString str, ...){
+    // empty (no parameter to set)
+}

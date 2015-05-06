@@ -8,6 +8,7 @@
 #include <QImage>
 #include <QString>
 #include <QTimer>
+#include <cstdarg>
 
 // --------------------------
 // Controller class
@@ -89,35 +90,18 @@ public:
     void saveImage(QString);
     void saveVideo(QString);
 
+    // --------------------------
+    // Process techniques functions
+    // -------------------------
+    void AddTechnique(QString, ...);
+    void setParameters(QString, int, ...);
+
 private slots:
     // Execute process
     void process(); // defined as slot to allow connection with signals, such as when image input is ready
 
     // Read frame from video/live stream
     void ReadFrame();
-
-    // --------------------------
-    // Algorithm instance + mutators
-    // --------------------------
-    // mutators: first parameter is index of instance in process vector
-
-    // Salt and pepper noise
-    void addSaltAndPepper(const double&);
-    void updateSaltAndPepperParams(const int&, const double&);
-
-    // Morphology erode
-    void addMorphologyOperation(const int&, const int&, const int&); // add to process flow
-    void updateMorphologyOperationParams(const int&, const int &, const int&, const int&); // mutator
-
-    void addLowPassFilter(const int&, const int&);
-    void updateLowPassFilter(const int&, const int&, const int&);
-
-    // Flip image
-    void addFlipImage(const short int&);
-    void updateFlipImageParams(const int&, const short int&);
-
-    // Equalize Histogram
-    void addEqualizeHistogram(void);
 
 signals:
     void ImageReadyInput(); // to display input image

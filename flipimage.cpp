@@ -4,7 +4,7 @@
 // Algorithm 1 - flip image
 // --------------------------
 flipimage::flipimage(){
-    flipcode = 0; // possible choices: 0,>0,<0
+    setParams(0); // possible choices: 0,>0,<0
 }
 
 flipimage::flipimage(const short& f){
@@ -30,4 +30,14 @@ void flipimage::process(cv::Mat& ip, cv::Mat& op){
 // mutator
 void flipimage::setParams(const short &f){
     flipcode = f;
+}
+
+void flipimage::setParameters(QString str, ...){
+    va_list args;
+    va_start(args, str);
+
+    int f = va_arg(args, int);
+    setParams(static_cast<short>(f)); // va sets short to int, so using int first and casting [4]
+
+    va_end(args);
 }

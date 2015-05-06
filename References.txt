@@ -2,8 +2,8 @@ References
 
 [1] http://stackoverflow.com/questions/34987/how-to-declare-an-array-of-strings-in-c
 [2] http://doc.qt.io/qt-4.8/qtimer.html
-
-
+[3] Canny threshold: http://docs.opencv.org/doc/tutorials/imgproc/imgtrans/canny_detector/canny_detector.html
+[4] Variadic functions: http://www.codeproject.com/Articles/4181/Variable-Argument-Functions
 
 
 [A] Tasbir, Abinash Pant

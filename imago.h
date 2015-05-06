@@ -44,22 +44,38 @@ private:
 private slots:
     void on_actionOpen_Image_triggered();
 
-    void DisplayInputImage(); // function to display input image in input label
-    void DisplayOutputImage(); // function to display output image in output label
-
     void on_actionOpen_Video_triggered();
+
     void on_actionOpen_Livestream_triggered();
 
 
+    void on_actionPause_Play_triggered();
+
+    void on_actionSave_Image_triggered();
+
+    void on_actionSave_Video_triggered();
+
+
+    void DisplayInputImage(); // function to display input image in input label
+
+    void DisplayOutputImage(); // function to display output image in output label
+
+
     void on_AddMorphologyOperation_clicked();
-    void morphologyOperationParamChanged(void);
 
     void on_AddFlipImage_clicked();
 
-    void flipImageParamChanged();
-
     void on_AddSaltAndPepper_clicked();
-    void saltAndPepperParamChanged();
+
+    void on_AddEqualizeHistogram_clicked();
+
+    void on_AddLowPassFilter_clicked();
+
+    void on_AddCanny_clicked();
+
+
+    void paramChanged();
+
 
     void on_moveProcessDown_clicked();
 
@@ -69,31 +85,8 @@ private slots:
 
     void on_refreshProcess_clicked();
 
-    void on_AddEqualizeHistogram_clicked();
-
-    void on_AddLowPassFilter_clicked();
-    void lowPassFilterParamChanged(void);
-
-    void on_actionPause_Play_triggered();
-
-    void on_actionSave_Image_triggered();
-
-    void on_actionSave_Video_triggered();
-
 signals:
-    void s_addSaltandPepper(const double&);
-    void updateSaltAndPepper(const int&, const double&);
 
-    void s_addMorphologyOperation(const int&, const int&, const int&);
-    void updateMorphologyOperation(const int&, const int&, const int&, const int&);
-
-    void s_addFlipImage(const short int);
-    void updateFlipImage(const int&, const short int&);
-
-    void s_addHistogramEqualize();
-
-    void s_addLowPassFilter(const int&, const int&);
-    void updateLowPassFilter(const int&, const int&, const int&);
 };
 
 #endif // IMAGO_H

@@ -12,6 +12,10 @@ public:
     ~histogramequalize();
 
     void process(cv::Mat &, cv::Mat &);
+
+    void setParameters(QString, ...);
+
+
 };
 
 #endif // HISTOGRAMEQUALIZE_H

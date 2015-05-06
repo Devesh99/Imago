@@ -26,8 +26,11 @@ public:
     void pepper(cv::Mat &, cv::Mat &,int);
 
 
-    // mutator function (specific to this algorithm)
+    // mutator function
     void setParams(const double&);
+
+    void setParameters(QString, ...);
+
 };
 
 #endif // SALTANDPEPPER_H
