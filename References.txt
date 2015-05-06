@@ -7,6 +7,11 @@ References
 
 
 [A] Tasbir, Abinash Pant
+[B] VPProject, Marwan Osman
 
-
-[a] Up arrow icon: http://www.clipartbest.com/clipart-ncX7xXrcB
+Icons:
+[a] Down arrow: http://uxrepo.com/static/icon-sets/ionicons/png32/512/000000/arrow-down-b-512-000000.png
+[b] Up arrow: flipped down arrow
+[c] Delete: https://azatty.files.wordpress.com/2011/03/hyphen-2.png
+[d] Refresh: http://uxrepo.com/static/icon-sets/elegant/png32/512/000000/icon_refresh-512-000000.png
+[e] Add technique: http://www.geocameroun.cm/static/aramis_portal/img/icon-map/plus.png

@@ -269,22 +269,35 @@ void processmanager::ReadFrame(){
     setInputImage(frame);
 }
 
-void processmanager::pauseTimer(void){
-    // capture is not released to simulate pause
 
+void processmanager::pauseplayTimer(void){
     if (capture.isOpened()){
         if (timer->isActive()){
             timer->stop();
         }
-    }
-}
-
-void processmanager::restartTimer(void){
-    // play after pause
-
-    if (capture.isOpened()){
-        if (!timer->isActive()){
+        else{
             timer->start(framedelay);
         }
     }
+}
+
+
+void processmanager::saveImage(QString filename){
+    cv::imwrite(filename.toStdString(), getOutputImage());
+}
+
+void processmanager::saveVideo(QString filename){
+    cv::VideoWriter VWriter;
+    VWriter.open(filename.toStdString(), CV_FOURCC('M','J','P','G'), capture.get(CV_CAP_PROP_FPS)*1.0, cv::Size(capture.get(CV_CAP_PROP_FRAME_WIDTH), capture.get(CV_CAP_PROP_FRAME_HEIGHT)) );
+        if (VWriter.isOpened()){
+        VWriter.write(getOutputImage());
+    }
+}
+
+void processmanager::setFileNameSave(QString str){
+    fileNameSave = str;
+}
+
+QString processmanager::getFileNameSave(void)const{
+    return fileNameSave;
 }

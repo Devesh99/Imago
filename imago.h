@@ -51,9 +51,6 @@ private slots:
     void on_actionOpen_Livestream_triggered();
 
 
-    void on_PauseTimer_clicked();
-    void on_RestartTimer_clicked();
-
     void on_AddMorphologyOperation_clicked();
     void morphologyOperationParamChanged(void);
 
@@ -72,10 +69,16 @@ private slots:
 
     void on_refreshProcess_clicked();
 
-    void on_AdEqualizeHistogram_clicked();
+    void on_AddEqualizeHistogram_clicked();
 
     void on_AddLowPassFilter_clicked();
     void lowPassFilterParamChanged(void);
+
+    void on_actionPause_Play_triggered();
+
+    void on_actionSave_Image_triggered();
+
+    void on_actionSave_Video_triggered();
 
 signals:
     void s_addSaltandPepper(const double&);

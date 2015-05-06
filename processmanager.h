@@ -29,6 +29,9 @@ private:
     QImage opQImage;
 
 
+    // saving filename
+    QString fileNameSave;
+
     // Video/live stream member attributes
     QTimer *timer;
     cv::VideoCapture capture; // video + livestream object
@@ -63,6 +66,10 @@ public:
     bool setOutputImageQImage(QImage);
 
 
+    // accessor/mutator for filename (save)
+    void setFileNameSave(QString);
+    QString getFileNameSave(void)const;
+
     // --------------------------
     // Add/move/remove/refresh processing techniques
     // --------------------------
@@ -77,9 +84,10 @@ public:
     void loadVideo(std::string);
     void loadLiveStream();
 
-    void pauseTimer(void);
-    void restartTimer(void);
+    void pauseplayTimer(void);
 
+    void saveImage(QString);
+    void saveVideo(QString);
 
 private slots:
     // Execute process

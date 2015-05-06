@@ -79,23 +79,44 @@ void Imago::initializeDefaultInputImage(void)const{
 }
 
 void Imago::setRanges(void){
-    int iconSize = 31;
-    ui->moveProcessUp->setIcon(QIcon(QPixmap("/Users/Devesh/Documents/MSCV/BSCV/Semester2/C++/Project/images/icon_arrow_up.png")));
-    ui->moveProcessUp->setIconSize(QSize(iconSize, iconSize));
+    // process flow icons [a,b,c,d]
+    // push buttons sizes modified for the icons to appear nice, refer ui
+    ui->moveProcessUp->setIcon(QIcon(QPixmap(":/icon_arrowup.png")));
+    ui->moveProcessUp->setIconSize(ui->moveProcessUp->size());
     ui->moveProcessUp->setFlat(true); // [A] set flat true: to disable boundaries display of push button, i.e. to show the icon. but boundaries displayed upon click to show response of click
 
-    ui->moveProcessDown->setIcon(QIcon(QPixmap("/Users/Devesh/Documents/MSCV/BSCV/Semester2/C++/Project/images/icon_arrow_down.png")));
-    ui->moveProcessDown->setIconSize(QSize(iconSize, iconSize));
+    ui->moveProcessDown->setIcon(QIcon(QPixmap(":/icon_arrowdown.png")));
+    ui->moveProcessDown->setIconSize(ui->moveProcessDown->size());
     ui->moveProcessDown->setFlat(true);
 
-    ui->removeProcess->setIcon(QIcon(QPixmap("/Users/Devesh/Documents/MSCV/BSCV/Semester2/C++/Project/images/icon_delete_grey.png")));
-    ui->removeProcess->setIconSize(QSize(iconSize, iconSize));
+    ui->removeProcess->setIcon(QIcon(QPixmap(":/icon_delete.jpg")));
+//    ui->removeProcess->setIconSize(QSize(ui->removeProcess->size().width() + 10, ui->removeProcess->height()));
+    ui->removeProcess->setIconSize(ui->removeProcess->size());
     ui->removeProcess->setFlat(true);
 
-    ui->refreshProcess->setIcon(QIcon(QPixmap("/Users/Devesh/Documents/MSCV/BSCV/Semester2/C++/Project/images/icon_refresh.png")));
-    ui->refreshProcess->setIconSize(QSize(iconSize, iconSize));
+
+    ui->refreshProcess->setIcon(QIcon(QPixmap(":/icon_refresh.png")));
+    ui->refreshProcess->setIconSize(ui->refreshProcess->size());
     ui->refreshProcess->setFlat(true);
 
+    // Add technique icons [b]
+    // not setting to flat as outline looks nice
+    ui->AddSaltAndPepper->setIcon(QIcon(QPixmap(":/icon_addtechnique.png")));
+    ui->AddSaltAndPepper->setIconSize(ui->AddSaltAndPepper->size());
+
+    ui->AddMorphologyOperation->setIcon(QIcon(QPixmap(":/icon_addtechnique.png")));
+    ui->AddMorphologyOperation->setIconSize(ui->AddMorphologyOperation->size());
+
+    ui->AddFlipImage->setIcon(QIcon(QPixmap(":/icon_addtechnique.png")));
+    ui->AddFlipImage->setIconSize(ui->AddFlipImage->size());
+
+    ui->AddLowPassFilter->setIcon(QIcon(QPixmap(":/icon_addtechnique.png")));
+    ui->AddLowPassFilter->setIconSize(ui->AddFlipImage->size());
+
+    ui->AddEqualizeHistogram->setIcon(QIcon(QPixmap(":/icon_addtechnique.png")));
+    ui->AddEqualizeHistogram->setIconSize(ui->AddFlipImage->size());
+
+    // process flow frame set to panel, sunken in ui through form
 
     // salt and pepper
     ui->sp_noiselevel->setRange(0,100); // noise level slider
@@ -177,8 +198,9 @@ void Imago::DisplayInputImage(){
         controller->setInputImageQImage(QImage((const unsigned char*)(controller->getInputImage().data),controller->getInputImageRGB().cols,controller->getInputImageRGB().rows,QImage::Format_Indexed8));
     }
 
-    ui->LabelInput->setPixmap(QPixmap::fromImage(controller->getInputImageQImage()));
-
+    // scaling to fit label, maintaining aspect ratio
+    ui->LabelInput->setAlignment(Qt::AlignCenter); //[B]
+    ui->LabelInput->setPixmap(QPixmap::fromImage(controller->getInputImageQImage()).scaled(ui->LabelInput->size(), Qt::KeepAspectRatio, Qt::FastTransformation)); // [B]
 }
 
 void Imago::DisplayOutputImage(){
@@ -191,7 +213,9 @@ void Imago::DisplayOutputImage(){
         controller->setOutputImageQImage(QImage((const unsigned char*)(controller->getOutputImage().data),controller->getOutputImageRGB().cols,controller->getOutputImageRGB().rows,QImage::Format_Indexed8));
     }
 
-    ui->LabelOutput->setPixmap(QPixmap::fromImage(controller->getOutputImageQImage()));
+    // scaling to fit label, maintaining aspect ratio
+    ui->LabelOutput->setAlignment(Qt::AlignCenter);
+    ui->LabelOutput->setPixmap(QPixmap::fromImage(controller->getOutputImageQImage()).scaled(ui->LabelOutput->size(), Qt::KeepAspectRatio, Qt::FastTransformation));
 }
 
 
@@ -218,19 +242,13 @@ void Imago::UpdateListWidgetRemove(const int &indx){
 }
 
 void Imago::UpdateListWidgetRefresh(void){
-    ui->techniquesListWidget->clear();
+    ui->techniquesListWidget->clear(); // current item set to one below automatically
 }
 
 
-
-void Imago::on_PauseTimer_clicked()
+void Imago::on_actionPause_Play_triggered()
 {
-    controller->pauseTimer();
-}
-
-void Imago::on_RestartTimer_clicked()
-{
-    controller->restartTimer();
+    controller->pauseplayTimer();
 }
 
 
@@ -307,7 +325,7 @@ void Imago::flipImageParamChanged(){
 }
 
 
-void Imago::on_AdEqualizeHistogram_clicked()
+void Imago::on_AddEqualizeHistogram_clicked()
 {
     emit s_addHistogramEqualize();
     UpdateListWidget(equalize_hist);
@@ -353,6 +371,24 @@ void Imago::on_refreshProcess_clicked()
 }
 
 
+void Imago::on_actionSave_Image_triggered()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save image"), "untitled.png", tr("Images (*.png, *.jpg"));
+    if (!fileName.isEmpty()){
+        // error-handling: not saved, not updated if empty (eg: user pressed cancel)
+        controller->saveImage(fileName);
+    }
 
 
+}
 
+void Imago::on_actionSave_Video_triggered()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save video"), "untitled.mov", tr("Videos (*.avi, *.mpeg4, *.mov, *.mp4"));
+    if (!fileName.isEmpty()){
+        // error-handling: not saved, not updated if empty (eg: user pressed cancel)
+        controller->saveVideo(fileName);
+    }
+
+
+}
