@@ -5,9 +5,10 @@ References
 [3] Canny threshold: http://docs.opencv.org/doc/tutorials/imgproc/imgtrans/canny_detector/canny_detector.html
 [4] Variadic functions: http://www.codeproject.com/Articles/4181/Variable-Argument-Functions
 
+[A] OpenCV Cookbook
+[B] Tasbir, Abinash Pant
+[C] VPProject, Marwan Osman
 
-[A] Tasbir, Abinash Pant
-[B] VPProject, Marwan Osman
 
 Icons:
 [a] Down arrow: http://uxrepo.com/static/icon-sets/ionicons/png32/512/000000/arrow-down-b-512-000000.png

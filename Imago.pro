@@ -44,7 +44,10 @@ SOURCES += main.cpp\
     morphologyoperation.cpp \
     lowpassfilter.cpp \
     cannyedgedetector.cpp \
-    stringsglobals.cpp
+    stringsglobals.cpp \
+    houghcircles.cpp \
+    houghlines.cpp \
+    highpassfilter.cpp
 
 HEADERS  += imago.h \
     iprocesstechnique.h \
@@ -56,7 +59,10 @@ HEADERS  += imago.h \
     stringsglobals.h \
     morphologyoperation.h \
     lowpassfilter.h \
-    cannyedgedetector.h
+    cannyedgedetector.h \
+    houghcircles.h \
+    houghlines.h \
+    highpassfilter.h
 
 FORMS    += imago.ui
 

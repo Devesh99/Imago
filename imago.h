@@ -85,6 +85,12 @@ private slots:
 
     void on_refreshProcess_clicked();
 
+    void on_AddHoughCircles_clicked();
+
+    void on_AddHoughLines_clicked();
+
+    void on_AddHighPassFilter_clicked();
+
 signals:
 
 };

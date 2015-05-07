@@ -56,11 +56,24 @@ void Imago::initializeConnections(void)const{
     QObject::connect(ui->LowPassFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(paramChanged()));
     QObject::connect(ui->LowPassFilterSize, SIGNAL(valueChanged(int)), this, SLOT(paramChanged()));
 
+    QObject::connect(ui->HighPassFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(paramChanged()));
+
     QObject::connect(ui->flipHorizontal, SIGNAL(clicked()), this, SLOT(paramChanged()));
     QObject::connect(ui->flipVertical, SIGNAL(clicked()), this, SLOT(paramChanged()));
     QObject::connect(ui->flipBoth, SIGNAL(clicked()), this, SLOT(paramChanged()));
 
     QObject::connect(ui->sliderCanny, SIGNAL(valueChanged(int)), this, SLOT(paramChanged()));
+
+    QObject::connect(ui->sliderHCCanny, SIGNAL(valueChanged(int)), this, SLOT(paramChanged()));
+    QObject::connect(ui->sliderHCVotes, SIGNAL(valueChanged(int)), this, SLOT(paramChanged()));
+    QObject::connect(ui->HCminDist, SIGNAL(valueChanged(double)), this, SLOT(paramChanged()));
+    QObject::connect(ui->HCminRad, SIGNAL(valueChanged(int)), this, SLOT(paramChanged()));
+    QObject::connect(ui->HCmaxRad, SIGNAL(valueChanged(int)), this, SLOT(paramChanged()));
+
+    QObject::connect(ui->HoughLinesOperation, SIGNAL(currentIndexChanged(int)), this, SLOT(paramChanged()));
+    QObject::connect(ui->HLrho, SIGNAL(valueChanged(double)), this, SLOT(paramChanged()));
+    QObject::connect(ui->HLtheta, SIGNAL(valueChanged(double)), this, SLOT(paramChanged()));
+    QObject::connect(ui->sliderHLthreshhold, SIGNAL(valueChanged(int)), this, SLOT(paramChanged()));
 }
 
 void Imago::initializeDefaultInputImage(void)const{
@@ -147,8 +160,19 @@ void Imago::setRanges(void){
         lpf_operations.push_back(QString::fromStdString("LPF " + *it2));
     }
 
+
     ui->LowPassFilterSize->setRange(3,15);
     ui->LowPassFilterSize->setSingleStep(2);
+
+    // high pass filter
+    const char* strarray3[] = {"Laplacian", "Sobel", "Scharr - X", "Scharr - Y"};
+    std::vector<std::string> v3(strarray3, strarray3 + sizeof(strarray3)/sizeof(strarray3[0])); // [1]
+    std::vector<std::string>::iterator it3;
+    for (it3 = v3.begin(); it3!=v3.end();it3++){
+        ui->HighPassFilter->addItem(QString::fromStdString(*it3)); // conversion to qstring required
+        hpf_operations.push_back(QString::fromStdString("HPF " + *it3));
+    }
+
 
     // flip image default method
     ui->flipVertical->setChecked(true);
@@ -156,6 +180,35 @@ void Imago::setRanges(void){
     // canny edge detection slider
     ui->sliderCanny->setRange(0, 100);
     ui->sliderCanny->setTickPosition(QSlider::TicksBelow);
+
+    // hough cirles
+    // error handling: avoid 0 values for function
+    ui->sliderHCCanny->setRange(1, 255);
+    ui->sliderHCVotes->setRange(1, 255);
+    ui->HCminDist->setRange(1, 255);
+    ui->HCminRad->setRange(1, 80);
+    ui->HCmaxRad->setRange(100, 1000);
+
+    ui->sliderHCCanny->setTickPosition(QSlider::TicksBelow);
+    ui->sliderHCVotes->setTickPosition(QSlider::TicksBelow);
+
+
+    // hough lines
+    hough_lines_operations.push_back(hough_lines);
+    hough_lines_operations.push_back(hough_lines + " P");
+    ui->HoughLinesOperation->addItem(hough_lines);
+    ui->HoughLinesOperation->addItem(hough_lines + " P");
+
+    // error handling: avoid 0 values for function
+    ui->HLrho->setRange(1, 10);
+    ui->HLrho->setSingleStep(0.1);
+    ui->HLtheta->setRange(1, 10);
+    ui->HLtheta->setSingleStep(0.1);
+    ui->sliderHLthreshhold->setRange(1, 255);
+
+    ui->sliderHLthreshhold->setTickPosition(QSlider::TicksBelow);
+
+
 }
 
 
@@ -272,6 +325,13 @@ void Imago::on_AddLowPassFilter_clicked()
     UpdateListWidget(lpf_operations[ui->LowPassFilter->currentIndex()] + " (" + QString::number(ui->LowPassFilterSize->value()) + ")");
 }
 
+void Imago::on_AddHighPassFilter_clicked()
+{
+    int hpfindx = ui->HighPassFilter->currentIndex();
+    controller->AddTechnique(hpf, hpfindx);
+    UpdateListWidget(hpf_operations[hpfindx]);
+}
+
 
 void Imago::on_AddFlipImage_clicked()
 {
@@ -300,6 +360,33 @@ void Imago::on_AddCanny_clicked()
     UpdateListWidget(canny + " (" + QString::number(ui->sliderCanny->value()) + ")");
 }
 
+
+void Imago::on_AddHoughCircles_clicked()
+{
+    double hcCanny = (double) ui->sliderHCCanny->value();
+    double hcVotes = (double) ui->sliderHCVotes->value();
+    double hcMinDist = ui->HCminDist->value();
+    int hcMinRad = ui->HCminRad->value();
+    int hcMaxRad = ui->HCmaxRad->value();
+
+    controller->AddTechnique(hough_circles,  hcMinDist, hcCanny, hcVotes, hcMinRad, hcMaxRad);
+    UpdateListWidget(hough_circles + " (" + QString::number(hcCanny) +", " + QString::number(hcVotes) +", " + QString::number(hcMinDist) +", " + QString::number(hcMinRad) +", " + QString::number(hcMaxRad) +")");
+}
+
+void Imago::on_AddHoughLines_clicked()
+{
+    int hlindex = ui->HoughLinesOperation->currentIndex();
+    double rho = ui->HLrho->value();
+    double theta = ui->HLtheta->value();
+    int thresh = ui->sliderHLthreshhold->value();
+
+    controller->AddTechnique(hough_lines, hlindex, rho, theta, thresh);
+    UpdateListWidget(hough_lines + " (" + ui->HoughLinesOperation->currentText() + QString::number(rho) +", " + QString::number(theta) + ", " + QString::number(thresh));
+}
+
+
+
+
 void Imago::paramChanged(){
     if (ui->techniquesListWidget->currentRow() > -1){ // -1 if no item is selected (intialized like this)
 
@@ -319,6 +406,11 @@ void Imago::paramChanged(){
             controller->setParameters(lpf, currRow, lpfindx, fs);
             str = (lpf_operations[lpfindx] + " (" + QString::number(fs) + ")");
         }
+        if (currString.contains(hpf)){
+            int hpfindx = ui->HighPassFilter->currentIndex();
+            controller->setParameters(hpf, currRow, hpfindx);
+            str = hpf_operations[hpfindx];
+        }
         if (currString.contains(morphology)){
             int m_indx = ui->MorphologyOperation->currentIndex();
             int m_selem = ui->MorphologySE->currentIndex();
@@ -335,6 +427,25 @@ void Imago::paramChanged(){
             int thresh = ui->sliderCanny->value();
             controller->setParameters(canny, currRow, thresh);
             str = (canny + " (" + QString::number(thresh));
+        }
+        if (currString.contains(hough_circles)){
+            double hcCanny = (double) ui->sliderHCCanny->value();
+            double hcVotes = (double) ui->sliderHCVotes->value();
+            double hcMinDist = ui->HCminDist->value();
+            int hcMinRad = ui->HCminRad->value();
+            int hcMaxRad = ui->HCmaxRad->value();
+
+            controller->setParameters(hough_circles, currRow, hcMinDist, hcCanny, hcVotes, hcMinRad, hcMaxRad);
+            str = (hough_circles + " (" + QString::number(hcCanny) + ", " + QString::number(hcVotes) + ", " + QString::number(hcMinDist) + ", " + QString::number(hcMinRad) + ", " + QString::number(hcMaxRad) +")");
+        }
+        if (currString.contains(hough_lines)){
+            int hlindex = ui->HoughLinesOperation->currentIndex();
+            double rho = ui->HLrho->value();
+            double theta = ui->HLtheta->value();
+            int thresh = ui->sliderHLthreshhold->value();
+
+            controller->setParameters(hough_lines, currRow, hlindex, rho, theta, thresh);
+            str = (hough_lines + " (" + ui->HoughLinesOperation->currentText() + QString::number(rho) +", " + QString::number(theta) + ", " + QString::number(thresh));
         }
         // error handling: since no parameters in histogram equalization, maintain string. (otherwise, would update with empty (default string) in to update call below.
         if (currString.contains(equalize_hist)){
@@ -404,5 +515,9 @@ void Imago::on_actionSave_Video_triggered()
 
 
 }
+
+
+
+
 
 

@@ -144,9 +144,31 @@ void processmanager::AddTechnique(QString str, ...){
         int fs = va_arg(args, int);
         pt = new lowpassfilter(lpfindx, fs);
     }
+    if (str.compare(hpf) == 0){
+        int hpfindx = va_arg(args, int);
+        pt = new highpassfilter(hpfindx);
+    }
     if (str.compare(salt_and_pepper) == 0){
         pt = new saltandpepper(va_arg(args, double));
     }
+    if (str.compare(hough_circles) == 0){
+        double m_dist = va_arg(args, double);
+        double c_thresh = va_arg(args, double);
+        double ce_thresh = va_arg(args, double);
+        int min_rad = va_arg(args, int);
+        int max_rad = va_arg(args, int);
+        pt = new houghcircles(m_dist, c_thresh, ce_thresh, min_rad, max_rad);
+    }
+    if (str.compare(hough_lines) == 0){
+        int hlindx = va_arg(args, int);
+        double r = va_arg(args, double);
+        double t = va_arg(args, double);
+        int th = va_arg(args, int);
+
+        pt = new houghlines(hlindx, r, t, th);
+    }
+
+
 
     processtechniquesList.push_back(pt);
 
@@ -181,8 +203,28 @@ void processmanager::setParameters(QString str, int indx, ...){
         int fs = va_arg(args, int);
         processtechniquesList[indx]->setParameters(str, lpfindx, fs);
     }
+    if (str.compare(hpf) == 0){
+        int hpfindx = va_arg(args, int);
+        processtechniquesList[indx]->setParameters(str, hpfindx);
+
+    }
     if (str.compare(salt_and_pepper) == 0){
         processtechniquesList[indx]->setParameters(str, va_arg(args, double));
+    }
+    if (str.compare(hough_circles) == 0){
+        double m_dist = va_arg(args, double);
+        double c_thresh = va_arg(args, double);
+        double ce_thresh = va_arg(args, double);
+        int min_rad = va_arg(args, int);
+        int max_rad = va_arg(args, int);
+        processtechniquesList[indx]->setParameters(str, m_dist, c_thresh, ce_thresh, min_rad, max_rad);
+    }
+    if (str.compare(hough_lines) == 0){
+        int hlindx = va_arg(args, int);
+        double r = va_arg(args, double);
+        double t = va_arg(args, double);
+        int th = va_arg(args, int);
+        processtechniquesList[indx]->setParameters(str, hlindx, r, t, th);
     }
 
     va_end(args);

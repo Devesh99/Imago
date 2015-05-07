@@ -20,5 +20,12 @@ extern QString equalize_hist;
 
 extern QString canny;
 
+extern QString hough_circles;
+
+extern std::vector<QString> hough_lines_operations;
+extern QString hough_lines;
+
+extern std::vector<QString> hpf_operations;
+extern QString hpf;
 #endif // STRINGSGLOBALS_H
 
