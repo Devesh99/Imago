@@ -3,9 +3,13 @@
 
 #include <iostream>
 #include <QFileDialog>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QMessageBox>
 
 #include "stringsglobals.h"
 
+extern void qt_set_sequence_auto_mnemonic(bool b);
 
 Imago::Imago(QWidget *parent) :
     QMainWindow(parent),
@@ -31,6 +35,8 @@ Imago::Imago(QWidget *parent) :
 
     // set widget ranges
     setRanges();
+
+    qt_set_sequence_auto_mnemonic(true);
 }
 
 Imago::~Imago()
@@ -95,8 +101,7 @@ void Imago::setRanges(void){
     ui->moveProcessDown->setIconSize(ui->moveProcessDown->size());
     ui->moveProcessDown->setFlat(true);
 
-    ui->removeProcess->setIcon(QIcon(QPixmap(":/icon_delete.jpg")));
-//    ui->removeProcess->setIconSize(QSize(ui->removeProcess->size().width() + 10, ui->removeProcess->height()));
+    ui->removeProcess->setIcon(QIcon(QPixmap(":/icon_delete.png")));
     ui->removeProcess->setIconSize(ui->removeProcess->size());
     ui->removeProcess->setFlat(true);
 
@@ -121,6 +126,19 @@ void Imago::setRanges(void){
 
     ui->AddEqualizeHistogram->setIcon(QIcon(QPixmap(":/icon_addtechnique.png")));
     ui->AddEqualizeHistogram->setIconSize(ui->AddFlipImage->size());
+
+    ui->AddCanny->setIcon(QIcon(QPixmap(":/icon_addtechnique.png")));
+    ui->AddCanny->setIconSize(ui->AddCanny->size());
+
+    ui->AddHoughLines->setIcon(QIcon(QPixmap(":/icon_addtechnique.png")));
+    ui->AddHoughLines->setIconSize(ui->AddHoughLines->size());
+
+    ui->AddHoughCircles->setIcon(QIcon(QPixmap(":/icon_addtechnique.png")));
+    ui->AddHoughCircles->setIconSize(ui->AddHoughCircles->size());
+
+    ui->AddHighPassFilter->setIcon(QIcon(QPixmap(":/icon_addtechnique.png")));
+    ui->AddHighPassFilter->setIconSize(ui->AddHighPassFilter->size());
+
 
     // process flow frame set to panel, sunken in ui through form
 
@@ -194,10 +212,10 @@ void Imago::setRanges(void){
 
 
     // hough lines
-    hough_lines_operations.push_back(hough_lines);
-    hough_lines_operations.push_back(hough_lines + " P");
-    ui->HoughLinesOperation->addItem(hough_lines);
-    ui->HoughLinesOperation->addItem(hough_lines + " P");
+    hough_lines_operations.push_back("Standard");
+    hough_lines_operations.push_back("Standard");
+    ui->HoughLinesOperation->addItem("Standard");
+    ui->HoughLinesOperation->addItem("Probabilistic");
 
     // error handling: avoid 0 values for function
     ui->HLrho->setRange(1, 10);
@@ -370,7 +388,7 @@ void Imago::on_AddHoughCircles_clicked()
     int hcMaxRad = ui->HCmaxRad->value();
 
     controller->AddTechnique(hough_circles,  hcMinDist, hcCanny, hcVotes, hcMinRad, hcMaxRad);
-    UpdateListWidget(hough_circles + " (" + QString::number(hcCanny) +", " + QString::number(hcVotes) +", " + QString::number(hcMinDist) +", " + QString::number(hcMinRad) +", " + QString::number(hcMaxRad) +")");
+    UpdateListWidget(hough_circles + " (" + QString::number(hcVotes) +", " + QString::number(hcCanny) +", " + QString::number(hcMinDist) +", " + QString::number(hcMinRad) +", " + QString::number(hcMaxRad) +")");
 }
 
 void Imago::on_AddHoughLines_clicked()
@@ -381,7 +399,7 @@ void Imago::on_AddHoughLines_clicked()
     int thresh = ui->sliderHLthreshhold->value();
 
     controller->AddTechnique(hough_lines, hlindex, rho, theta, thresh);
-    UpdateListWidget(hough_lines + " (" + ui->HoughLinesOperation->currentText() + QString::number(rho) +", " + QString::number(theta) + ", " + QString::number(thresh));
+    UpdateListWidget(hough_lines + " (" + ui->HoughLinesOperation->currentText() + ", " + QString::number(rho) +", " + QString::number(theta) + ", " + QString::number(thresh) + ")");
 }
 
 
@@ -426,7 +444,7 @@ void Imago::paramChanged(){
         if (currString.contains(canny)){
             int thresh = ui->sliderCanny->value();
             controller->setParameters(canny, currRow, thresh);
-            str = (canny + " (" + QString::number(thresh));
+            str = (canny + " (" + QString::number(thresh) + ")");
         }
         if (currString.contains(hough_circles)){
             double hcCanny = (double) ui->sliderHCCanny->value();
@@ -436,7 +454,7 @@ void Imago::paramChanged(){
             int hcMaxRad = ui->HCmaxRad->value();
 
             controller->setParameters(hough_circles, currRow, hcMinDist, hcCanny, hcVotes, hcMinRad, hcMaxRad);
-            str = (hough_circles + " (" + QString::number(hcCanny) + ", " + QString::number(hcVotes) + ", " + QString::number(hcMinDist) + ", " + QString::number(hcMinRad) + ", " + QString::number(hcMaxRad) +")");
+            str = (hough_circles + " (" + QString::number(hcVotes) + ", " + QString::number(hcCanny) + ", " + QString::number(hcMinDist) + ", " + QString::number(hcMinRad) + ", " + QString::number(hcMaxRad) +")");
         }
         if (currString.contains(hough_lines)){
             int hlindex = ui->HoughLinesOperation->currentIndex();
@@ -445,7 +463,7 @@ void Imago::paramChanged(){
             int thresh = ui->sliderHLthreshhold->value();
 
             controller->setParameters(hough_lines, currRow, hlindex, rho, theta, thresh);
-            str = (hough_lines + " (" + ui->HoughLinesOperation->currentText() + QString::number(rho) +", " + QString::number(theta) + ", " + QString::number(thresh));
+            str = (hough_lines + " (" + ui->HoughLinesOperation->currentText() + ", " + QString::number(rho) +", " + QString::number(theta) + ", " + QString::number(thresh) + ")");
         }
         // error handling: since no parameters in histogram equalization, maintain string. (otherwise, would update with empty (default string) in to update call below.
         if (currString.contains(equalize_hist)){
@@ -496,10 +514,10 @@ void Imago::on_refreshProcess_clicked()
 
 void Imago::on_actionSave_Image_triggered()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save image"), "untitled.png", tr("Images (*.png, *.jpg"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save image"), QString::fromStdString(controller->getFileNameSave()), tr("Images (*.png)")); // providing only one format so that user may enter only filename without extension (set by default to this format)
     if (!fileName.isEmpty()){
         // error-handling: not saved, not updated if empty (eg: user pressed cancel)
-        controller->saveImage(fileName);
+        controller->saveImage(fileName.toStdString());
     }
 
 
@@ -507,12 +525,20 @@ void Imago::on_actionSave_Image_triggered()
 
 void Imago::on_actionSave_Video_triggered()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save video"), "untitled.mov", tr("Videos (*.avi, *.mpeg4, *.mov, *.mp4"));
-    if (!fileName.isEmpty()){
-        // error-handling: not saved, not updated if empty (eg: user pressed cancel)
-        controller->saveVideo(fileName);
-    }
+    if (controller->getSaveVideoFlag()){
+        controller->setSaveVideoFlag(false);
 
+        ui->menuSave->actions().at(1)->setText("Video");
+    }
+    else{
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save video"), "", tr("Videos (*.avi)"));
+        if (!fileName.isEmpty()){
+            // error-handling: not saved, not updated if empty (eg: user pressed cancel)
+            controller->saveVideo(fileName);
+
+            ui->menuSave->actions().at(1)->setText("Stop save");
+        }
+    }
 
 }
 
@@ -521,3 +547,20 @@ void Imago::on_actionSave_Video_triggered()
 
 
 
+
+void Imago::on_actionUser_Manual_triggered()
+{
+    // Open github repository as it contains latest updates, platform independent
+    // preferable to opening a file (though offline could be nice)
+    // [B]
+    QString link = "https://github.com/Devesh99/Imago";
+    QDesktopServices::openUrl(QUrl(link));
+
+}
+
+void Imago::on_actionAbout_triggered()
+{
+    // [B]
+    // [5] tr: marks the string for translation (useful if the application were to be translated for other languages use)
+    QMessageBox::about(this, tr("About Imago"), tr("Imago is an image processing toolbox developed in C++ using Qt 5.1.1 and OpenCV 2.4.8. \n \n Devesh Adlakha \n deveshadlakha@gmail.com"));
+}

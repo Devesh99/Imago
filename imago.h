@@ -91,6 +91,10 @@ private slots:
 
     void on_AddHighPassFilter_clicked();
 
+    void on_actionUser_Manual_triggered();
+
+    void on_actionAbout_triggered();
+
 signals:
 
 };

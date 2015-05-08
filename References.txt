@@ -4,6 +4,9 @@ References
 [2] http://doc.qt.io/qt-4.8/qtimer.html
 [3] Canny threshold: http://docs.opencv.org/doc/tutorials/imgproc/imgtrans/canny_detector/canny_detector.html
 [4] Variadic functions: http://www.codeproject.com/Articles/4181/Variable-Argument-Functions
+[5] About menu: http://doc.qt.io/qt-5/qtwidgets-mainwindows-application-example.html
+[6] Video writer OpenCV Mac:http://stackoverflow.com/questions/4872383/how-to-write-a-video-file-with-opencv
+[7] QFileInfo string parsing: http://stackoverflow.com/questions/15244911/removing-extension-of-a-file-name-in-qt
 
 [A] OpenCV Cookbook
 [B] Tasbir, Abinash Pant

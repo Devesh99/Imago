@@ -2,9 +2,9 @@
     <qresource prefix="/">
         <file>boldt.jpg</file>
         <file>icon_addtechnique.png</file>
-        <file>icon_delete.jpg</file>
         <file>icon_arrowdown.png</file>
         <file>icon_arrowup.png</file>
         <file>icon_refresh.png</file>
+        <file>icon_delete.png</file>
     </qresource>
 </RCC>

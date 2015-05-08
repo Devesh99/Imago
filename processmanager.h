@@ -31,14 +31,15 @@ private:
 
 
     // saving filename
-    QString fileNameSave;
+    std::string fileNameSave;
 
     // Video/live stream member attributes
     QTimer *timer;
     cv::VideoCapture capture; // video + livestream object
     int framedelay; // for timer object
 
-
+    cv::VideoWriter writer;
+    bool isSaveVideo;
 
 public:
     processmanager(); // constructor
@@ -68,8 +69,8 @@ public:
 
 
     // accessor/mutator for filename (save)
-    void setFileNameSave(QString);
-    QString getFileNameSave(void)const;
+    void setFileNameSave(std::string);
+    std::string getFileNameSave(void)const;
 
     // --------------------------
     // Add/move/remove/refresh processing techniques
@@ -87,8 +88,11 @@ public:
 
     void pauseplayTimer(void);
 
-    void saveImage(QString);
+    void saveImage(std::string);
     void saveVideo(QString);
+
+    bool getSaveVideoFlag()const;
+    void setSaveVideoFlag(bool);
 
     // --------------------------
     // Process techniques functions
@@ -102,6 +106,9 @@ private slots:
 
     // Read frame from video/live stream
     void ReadFrame();
+
+    // Save frame from image/video/livestream
+    void SaveFrame();
 
 signals:
     void ImageReadyInput(); // to display input image

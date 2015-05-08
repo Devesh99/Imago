@@ -1,6 +1,8 @@
 #include "processmanager.h"
 #include "stringsglobals.h"
 
+#include <QFileInfo>
+
 // --------------------------
 // Controller class
 // --------------------------
@@ -13,6 +15,9 @@ processmanager::processmanager()
     timer = new QTimer(this);
 
     connect(timer, SIGNAL(timeout()),this, SLOT(ReadFrame()));
+
+    QObject::connect(this, SIGNAL(ImageReadyOutput()), this, SLOT(SaveFrame()));
+    isSaveVideo = false;
 }
 
 
@@ -288,6 +293,12 @@ void processmanager::loadImage(std::string filename){
         capture.release();
     }
     setInputImage(filename);
+
+    // ----
+    // Dirty implementation: fix this to uniformly use qstring
+    // ----
+    QFileInfo tempObj(QString::fromStdString(filename)); // [7] QFileInfo object allows the string parsing
+    setFileNameSave(tempObj.baseName().toStdString()); // extracts filename without extension (or other '.')
 }
 
 void processmanager::loadVideo(std::string filename){
@@ -304,6 +315,12 @@ void processmanager::loadVideo(std::string filename){
         framedelay=1000/rate;
         // timer restarts (no need to stop and start) [2]
         timer->start(framedelay); // set for pause/play utilization
+
+        // ----
+        // Dirty implementation: fix this to uniformly use qstring
+        // ----
+        QFileInfo tempObj(QString::fromStdString(filename)); // [7] QFileInfo object allows the string parsing
+        setFileNameSave(tempObj.baseName().toStdString()); // extracts filename without extension (or other '.')
     }
 }
 
@@ -320,6 +337,8 @@ void processmanager::loadLiveStream(){
         // timer restarts (no need to stop and start) [2]
         framedelay = 0; // set for pause/play utilization
         timer->start(framedelay);
+
+        setFileNameSave("livestream");
     }
 }
 
@@ -328,6 +347,14 @@ void processmanager::ReadFrame(){
     cv::Mat frame;
     capture>>frame;
     setInputImage(frame);
+}
+
+void processmanager::SaveFrame(){
+    if (getSaveVideoFlag()){
+        if (writer.isOpened()){
+            writer.write(getOutputImage());
+        }
+    }
 }
 
 
@@ -344,26 +371,50 @@ void processmanager::pauseplayTimer(void){
 }
 
 
-void processmanager::saveImage(QString filename){
-    cv::imwrite(filename.toStdString(), getOutputImage());
+void processmanager::saveImage(std::string filename){
+    cv::imwrite(filename, getOutputImage());
 }
 
 void processmanager::saveVideo(QString filename){
-    cv::VideoWriter VWriter;
-    VWriter.open(filename.toStdString(), CV_FOURCC('M','J','P','G'), capture.get(CV_CAP_PROP_FPS)*1.0, cv::Size(capture.get(CV_CAP_PROP_FRAME_WIDTH), capture.get(CV_CAP_PROP_FRAME_HEIGHT)) );
-        if (VWriter.isOpened()){
-        VWriter.write(getOutputImage());
+    // FIX: video writer does not seem to work with Mac [6]
+
+
+    //        writer.open(filename.toStdString(), CV_FOURCC('j','p','e','g'), 1000.0/framedelay, cv::Size(op.cols, op.rows) );
+    //        writer.open(filename.toStdString(), CV_FOURCC('j','p','e','g'), capture.get(CV_CAP_PROP_FPS)*1.0, cv::Size(capture.get(CV_CAP_PROP_FRAME_WIDTH), capture.get(CV_CAP_PROP_FRAME_HEIGHT)) );
+    //            writer.open(filename.toStdString(), CV_FOURCC('j','p','e','g'), 1000/framedelay, cv::Size(op.cols, op.rows) );
+
+    if (capture.isOpened()){
+        if (framedelay == 0){
+            writer.open(filename.toStdString(), CV_FOURCC('j','p','e','g'), 15, cv::Size(op.cols, op.rows) );
+        }
+        else{
+            writer.open(filename.toStdString(), CV_FOURCC('j','p','e','g'), 1000/framedelay, cv::Size(op.cols, op.rows) );
+        }
     }
+    else{
+            writer.open(filename.toStdString(), CV_FOURCC('j','p','e','g'), 1, cv::Size(op.cols, op.rows) );
+    }
+
+
+
+    setSaveVideoFlag(true);
 }
 
-void processmanager::setFileNameSave(QString str){
+
+
+void processmanager::setFileNameSave(std::string str){
     fileNameSave = str;
 }
 
-QString processmanager::getFileNameSave(void)const{
+std::string processmanager::getFileNameSave(void)const{
     return fileNameSave;
 }
 
 
+void processmanager::setSaveVideoFlag(bool flag){
+    isSaveVideo = flag;
+}
 
-
+bool processmanager::getSaveVideoFlag(void)const{
+    return isSaveVideo;
+}
