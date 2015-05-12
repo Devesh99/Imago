@@ -7,6 +7,8 @@ References
 [5] About menu: http://doc.qt.io/qt-5/qtwidgets-mainwindows-application-example.html
 [6] Video writer OpenCV Mac:http://stackoverflow.com/questions/4872383/how-to-write-a-video-file-with-opencv
 [7] QFileInfo string parsing: http://stackoverflow.com/questions/15244911/removing-extension-of-a-file-name-in-qt
+[8] Video writer Mac codec fix: http://www.codeitive.com/0HmeejqXWg/how-to-write-a-video-file-with-opencv.html
+[9]: Video writer Mac like [8] mentions lower case: http://stackoverflow.com/questions/10605163/opencv-videowriter-under-osx-producing-no-output
 
 [A] OpenCV Cookbook
 [B] Tasbir, Abinash Pant
