@@ -37,6 +37,7 @@ Imago::Imago(QWidget *parent) :
     setRanges();
 
     qt_set_sequence_auto_mnemonic(true);
+
 }
 
 Imago::~Imago()
