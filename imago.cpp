@@ -3,13 +3,12 @@
 
 #include <iostream>
 #include <QFileDialog>
-#include <QDesktopServices>
-#include <QUrl>
-#include <QMessageBox>
+#include <QDesktopServices> // user manual
+#include <QUrl> // user manual
+#include <QMessageBox> // about Imago
 
-#include "stringsglobals.h"
 
-extern void qt_set_sequence_auto_mnemonic(bool b);
+extern void qt_set_sequence_auto_mnemonic(bool b); // Mac keyboard shortcuts enable [10]
 
 Imago::Imago(QWidget *parent) :
     QMainWindow(parent),
@@ -20,15 +19,9 @@ Imago::Imago(QWidget *parent) :
     // instantiating controller (single instance per application run, accomplishes singleton pattern)
     controller = new processmanager;
 
-    // --------------------------
-    // Signals/slots
-    //---------------------------
+
+    // Signals/slots    
     initializeConnections();
-
-    // --------------------------
-    // Initialization function calls
-    // --------------------------
-
 
     // set default input image (from resource file)
     initializeDefaultInputImage();
@@ -36,7 +29,8 @@ Imago::Imago(QWidget *parent) :
     // set widget ranges
     setRanges();
 
-    qt_set_sequence_auto_mnemonic(true);
+
+    qt_set_sequence_auto_mnemonic(true); // to enable shortcuts in mac
 
 }
 
@@ -53,7 +47,6 @@ void Imago::initializeConnections(void)const{
 
 
     // Algorithm function mutators
-
     QObject::connect(ui->sp_noiselevel, SIGNAL(valueChanged(int)), this, SLOT(paramChanged()));
 
     QObject::connect(ui->MorphologySE, SIGNAL(currentIndexChanged(int)), this, SLOT(paramChanged()));
@@ -93,7 +86,6 @@ void Imago::initializeDefaultInputImage(void)const{
 
 void Imago::setRanges(void){
     // process flow icons [a,b,c,d]
-    // push buttons sizes modified for the icons to appear nice, refer ui
     ui->moveProcessUp->setIcon(QIcon(QPixmap(":/icon_arrowup.png")));
     ui->moveProcessUp->setIconSize(ui->moveProcessUp->size());
     ui->moveProcessUp->setFlat(true); // [A] set flat true: to disable boundaries display of push button, i.e. to show the icon. but boundaries displayed upon click to show response of click
@@ -107,11 +99,14 @@ void Imago::setRanges(void){
     ui->removeProcess->setFlat(true);
 
 
+    // process flow frame set to panel, sunken in ui through form
+
+
     ui->refreshProcess->setIcon(QIcon(QPixmap(":/icon_refresh.png")));
     ui->refreshProcess->setIconSize(ui->refreshProcess->size());
     ui->refreshProcess->setFlat(true);
 
-    // Add technique icons [b]
+    // Add technique icons [e]
     // not setting to flat as outline looks nice
     ui->AddSaltAndPepper->setIcon(QIcon(QPixmap(":/icon_addtechnique.png")));
     ui->AddSaltAndPepper->setIconSize(ui->AddSaltAndPepper->size());
@@ -141,8 +136,6 @@ void Imago::setRanges(void){
     ui->AddHighPassFilter->setIconSize(ui->AddHighPassFilter->size());
 
 
-    // process flow frame set to panel, sunken in ui through form
-
     // salt and pepper
     ui->sp_noiselevel->setRange(0,100); // noise level slider
     ui->sp_noiselevel->setTickInterval(10); // 0.1 interval between ticks
@@ -155,7 +148,6 @@ void Imago::setRanges(void){
     for (it = v.begin(); it!=v.end();it++){
         ui->MorphologySE->addItem(QString::fromStdString(*it)); // conversion to qstring required
     }
-
 
     // morphology operations
     const char* strarray1[] = {"Erode", "Dilate", "Open", "Close", "Gradient", "Top hat", "Black hat"};
@@ -179,9 +171,9 @@ void Imago::setRanges(void){
         lpf_operations.push_back(QString::fromStdString("LPF " + *it2));
     }
 
-
     ui->LowPassFilterSize->setRange(3,15);
     ui->LowPassFilterSize->setSingleStep(2);
+
 
     // high pass filter
     const char* strarray3[] = {"Laplacian", "Sobel", "Scharr - X", "Scharr - Y"};
@@ -196,9 +188,11 @@ void Imago::setRanges(void){
     // flip image default method
     ui->flipVertical->setChecked(true);
 
+
     // canny edge detection slider
     ui->sliderCanny->setRange(0, 100);
     ui->sliderCanny->setTickPosition(QSlider::TicksBelow);
+
 
     // hough cirles
     // error handling: avoid 0 values for function
@@ -227,10 +221,12 @@ void Imago::setRanges(void){
 
     ui->sliderHLthreshhold->setTickPosition(QSlider::TicksBelow);
 
-
 }
 
 
+// --------------
+// Menu bar
+// --------------
 void Imago::on_actionOpen_Image_triggered()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), ".",tr("Image files(*.png *.jpg *.bmp"));
@@ -239,7 +235,6 @@ void Imago::on_actionOpen_Image_triggered()
     if (!fileName.isEmpty()){
         controller->loadImage(fileName.toStdString());
     }
-
 }
 
 void Imago::on_actionOpen_Video_triggered()
@@ -249,7 +244,6 @@ void Imago::on_actionOpen_Video_triggered()
     if (!fileName.isEmpty()){
         controller->loadVideo(fileName.toStdString());
     }
-
 }
 
 void Imago::on_actionOpen_Livestream_triggered()
@@ -257,7 +251,59 @@ void Imago::on_actionOpen_Livestream_triggered()
     controller->loadLiveStream();
 }
 
+void Imago::on_actionPause_Play_triggered()
+{
+    controller->pauseplayTimer();
+}
 
+// Save
+void Imago::on_actionSave_Image_triggered()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save image"), QString::fromStdString(controller->getFileNameSave()), tr("Images (*.png)")); // providing only one format so that user may enter only filename without extension (set by default to this format)
+    if (!fileName.isEmpty()){
+        // error-handling: not saved, not updated if empty (eg: user pressed cancel)
+        controller->saveImage(fileName.toStdString());
+    }
+}
+
+void Imago::on_actionSave_Video_triggered()
+{
+    if (controller->getSaveVideoFlag()){
+        controller->setSaveVideoFlag(false);
+
+        ui->menuSave->actions().at(1)->setText("Video"); // update save menu
+    }
+    else{
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save video"), QString::fromStdString(controller->getFileNameSave()), tr("Videos (*.avi)")); // only avi extension (1 extension allows automatic extension addition, at least on this Mac)
+        if (!fileName.isEmpty()){
+            // error-handling: not saved, not updated if empty (eg: user pressed cancel)
+            controller->saveVideo(fileName);
+
+            ui->menuSave->actions().at(1)->setText("Stop save"); // update menu to stop save
+        }
+    }
+}
+
+// About/User manual
+void Imago::on_actionUser_Manual_triggered()
+{
+    // Open github repository as it contains latest updates, platform independent
+    // preferable to opening a file (though offline could be nice)
+    // [B]
+    QString link = "https://github.com/Devesh99/Imago";
+    QDesktopServices::openUrl(QUrl(link));
+}
+
+void Imago::on_actionAbout_triggered()
+{
+    // [B]
+    // [5] tr: marks the string for translation (useful if the application were to be translated for other languages use)
+    // Only use of pop-up here
+    QMessageBox::about(this, tr("About Imago"), tr("Imago is an image processing toolbox developed in C++ using Qt 5.1.1 and OpenCV 2.4.8. \n \n Devesh Adlakha \n deveshadlakha@gmail.com"));
+}
+
+
+// Display image slots
 void Imago::DisplayInputImage(){
     if (controller->getInputImage().channels()==3){
         cvtColor(controller->getInputImage(),controller->getInputImageRGB(),CV_BGR2RGB);
@@ -289,39 +335,9 @@ void Imago::DisplayOutputImage(){
 }
 
 
-
-void Imago::UpdateListWidget(QString str){
-    ui->techniquesListWidget->addItem(str); // algorithm name
-    ui->techniquesListWidget->setCurrentRow(ui->techniquesListWidget->count() - 1); // setting added technique as current item
-}
-
-void Imago::UpdateListWidgetCurr(QString str){
-    ui->techniquesListWidget->currentItem()->setText(str);
-}
-
-void Imago::UpdateListWidgetMove(const int &indx1, const int &indx2){
-    QString str(ui->techniquesListWidget->item(indx1)->text());
-    ui->techniquesListWidget->item(indx1)->setText(ui->techniquesListWidget->item(indx2)->text());
-    ui->techniquesListWidget->item(indx2)->setText(str);
-    ui->techniquesListWidget->setCurrentRow(indx2);
-}
-
-void Imago::UpdateListWidgetRemove(const int &indx){
-    QListWidgetItem* it = ui->techniquesListWidget->takeItem(indx);
-    delete it;
-}
-
-void Imago::UpdateListWidgetRefresh(void){
-    ui->techniquesListWidget->clear(); // current item set to one below automatically
-}
-
-
-void Imago::on_actionPause_Play_triggered()
-{
-    controller->pauseplayTimer();
-}
-
-
+// --------------
+// Add technique
+// --------------
 void Imago::on_AddSaltAndPepper_clicked()
 {
     double nlevel = ui->sp_noiselevel->value()/100.0;
@@ -329,14 +345,11 @@ void Imago::on_AddSaltAndPepper_clicked()
     UpdateListWidget(salt_and_pepper + "(" + QString::number(nlevel) + ")");
 }
 
-
 void Imago::on_AddMorphologyOperation_clicked()
 {
     controller->AddTechnique(morphology, ui->MorphologyOperation->currentIndex(), ui->MorphologySE->currentIndex(), ui->MorphologySESize->value());
     UpdateListWidget(morphology_operations[ui->MorphologyOperation->currentIndex()] + " (" + ui->MorphologySE->currentText() + ", " + QString::number(ui->MorphologySESize->value()) + ")");
-
 }
-
 
 void Imago::on_AddLowPassFilter_clicked()
 {
@@ -350,7 +363,6 @@ void Imago::on_AddHighPassFilter_clicked()
     controller->AddTechnique(hpf, hpfindx);
     UpdateListWidget(hpf_operations[hpfindx]);
 }
-
 
 void Imago::on_AddFlipImage_clicked()
 {
@@ -366,7 +378,6 @@ short Imago::determineFlipCode(void)const{
     return 0;
 }
 
-
 void Imago::on_AddEqualizeHistogram_clicked()
 {
     controller->AddTechnique(equalize_hist);
@@ -378,7 +389,6 @@ void Imago::on_AddCanny_clicked()
     controller->AddTechnique(canny, ui->sliderCanny->value());
     UpdateListWidget(canny + " (" + QString::number(ui->sliderCanny->value()) + ")");
 }
-
 
 void Imago::on_AddHoughCircles_clicked()
 {
@@ -404,15 +414,17 @@ void Imago::on_AddHoughLines_clicked()
 }
 
 
-
-
+// --------------
+// Dynamic updates to parameters algorithms
+// --------------
 void Imago::paramChanged(){
     if (ui->techniquesListWidget->currentRow() > -1){ // -1 if no item is selected (intialized like this)
 
-        QString str;
+        QString str; // string to update list widget
         QString currString = ui->techniquesListWidget->currentItem()->text();
         int currRow = ui->techniquesListWidget->currentRow();
 
+        // check for contains algorithm name, since in list, algorithm + parameters.
         if (currString.contains(flip_image)){
             short flipcode = determineFlipCode();
             controller->setParameters(flip_image, currRow, flipcode);
@@ -476,6 +488,38 @@ void Imago::paramChanged(){
 }
 
 
+// --------------
+// Update list widget
+// --------------
+void Imago::UpdateListWidget(QString str){
+    ui->techniquesListWidget->addItem(str); // algorithm name
+    ui->techniquesListWidget->setCurrentRow(ui->techniquesListWidget->count() - 1); // setting added technique as current item
+}
+
+void Imago::UpdateListWidgetCurr(QString str){
+    ui->techniquesListWidget->currentItem()->setText(str);
+}
+
+void Imago::UpdateListWidgetMove(const int &indx1, const int &indx2){
+    QString str(ui->techniquesListWidget->item(indx1)->text());
+    ui->techniquesListWidget->item(indx1)->setText(ui->techniquesListWidget->item(indx2)->text());
+    ui->techniquesListWidget->item(indx2)->setText(str);
+    ui->techniquesListWidget->setCurrentRow(indx2);
+}
+
+void Imago::UpdateListWidgetRemove(const int &indx){
+    QListWidgetItem* it = ui->techniquesListWidget->takeItem(indx);
+    delete it;
+}
+
+void Imago::UpdateListWidgetRefresh(void){
+    ui->techniquesListWidget->clear(); // current item set to one below automatically
+}
+
+
+// --------------
+// Process flow toolbar
+// --------------
 void Imago::on_moveProcessUp_clicked()
 {
     int currRow = ui->techniquesListWidget->currentRow();
@@ -493,7 +537,6 @@ void Imago::on_moveProcessDown_clicked()
         UpdateListWidgetMove(currRow, currRow + 1);
     }
 }
-
 
 void Imago::on_removeProcess_clicked()
 {
@@ -513,55 +556,3 @@ void Imago::on_refreshProcess_clicked()
 }
 
 
-void Imago::on_actionSave_Image_triggered()
-{
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save image"), QString::fromStdString(controller->getFileNameSave()), tr("Images (*.png)")); // providing only one format so that user may enter only filename without extension (set by default to this format)
-    if (!fileName.isEmpty()){
-        // error-handling: not saved, not updated if empty (eg: user pressed cancel)
-        controller->saveImage(fileName.toStdString());
-    }
-
-
-}
-
-void Imago::on_actionSave_Video_triggered()
-{
-    if (controller->getSaveVideoFlag()){
-        controller->setSaveVideoFlag(false);
-
-        ui->menuSave->actions().at(1)->setText("Video");
-    }
-    else{
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save video"), "", tr("Videos (*.avi)"));
-        if (!fileName.isEmpty()){
-            // error-handling: not saved, not updated if empty (eg: user pressed cancel)
-            controller->saveVideo(fileName);
-
-            ui->menuSave->actions().at(1)->setText("Stop save");
-        }
-    }
-
-}
-
-
-
-
-
-
-
-void Imago::on_actionUser_Manual_triggered()
-{
-    // Open github repository as it contains latest updates, platform independent
-    // preferable to opening a file (though offline could be nice)
-    // [B]
-    QString link = "https://github.com/Devesh99/Imago";
-    QDesktopServices::openUrl(QUrl(link));
-
-}
-
-void Imago::on_actionAbout_triggered()
-{
-    // [B]
-    // [5] tr: marks the string for translation (useful if the application were to be translated for other languages use)
-    QMessageBox::about(this, tr("About Imago"), tr("Imago is an image processing toolbox developed in C++ using Qt 5.1.1 and OpenCV 2.4.8. \n \n Devesh Adlakha \n deveshadlakha@gmail.com"));
-}

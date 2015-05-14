@@ -1,5 +1,6 @@
 #include "highpassfilter.h"
 
+
 highpassfilter::highpassfilter()
 {
     setParams(0); // laplacian by default
@@ -37,6 +38,7 @@ void highpassfilter::process(cv::Mat &ip, cv::Mat &op){
         break;
     }
 }
+
 
 void highpassfilter::setParameters(QString str, ...){
     va_list args;

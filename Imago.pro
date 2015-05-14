@@ -36,33 +36,33 @@ LIBS += -lopencv_stitching
 
 SOURCES += main.cpp\
         imago.cpp \
-    iprocesstechnique.cpp \
-    flipimage.cpp \
+    lib/iprocesstechnique.cpp \
+    lib/flipimage.cpp \
     processmanager.cpp \
-    saltandpepper.cpp \
-    histogramequalize.cpp \
-    morphologyoperation.cpp \
-    lowpassfilter.cpp \
-    cannyedgedetector.cpp \
-    stringsglobals.cpp \
-    houghcircles.cpp \
-    houghlines.cpp \
-    highpassfilter.cpp
+    lib/saltandpepper.cpp \
+    lib/histogramequalize.cpp \
+    lib/morphologyoperation.cpp \
+    lib/lowpassfilter.cpp \
+    lib/cannyedgedetector.cpp \
+    lib/stringsglobals.cpp \
+    lib/houghcircles.cpp \
+    lib/houghlines.cpp \
+    lib/highpassfilter.cpp
 
 HEADERS  += imago.h \
-    iprocesstechnique.h \
-    flipimage.h \
+    lib/iprocesstechnique.h \
+    lib/flipimage.h \
     processmanager.h \
-    allalgorithms.h \
-    saltandpepper.h \
-    histogramequalize.h \
-    stringsglobals.h \
-    morphologyoperation.h \
-    lowpassfilter.h \
-    cannyedgedetector.h \
-    houghcircles.h \
-    houghlines.h \
-    highpassfilter.h
+    lib/allalgorithms.h \
+    lib/saltandpepper.h \
+    lib/histogramequalize.h \
+    lib/stringsglobals.h \
+    lib/morphologyoperation.h \
+    lib/lowpassfilter.h \
+    lib/cannyedgedetector.h \
+    lib/houghcircles.h \
+    lib/houghlines.h \
+    lib/highpassfilter.h
 
 FORMS    += imago.ui
 

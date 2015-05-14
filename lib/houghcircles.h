@@ -6,6 +6,7 @@
 class houghcircles : public Iprocesstechnique
 {
 private:
+    // refer docs for parameters, if required
     double min_dist;
     double canny_thresh;
     double center_thresh;

@@ -1,8 +1,6 @@
 #include "flipimage.h"
 
-// --------------------------
-// Algorithm 1 - flip image
-// --------------------------
+
 flipimage::flipimage(){
     setParams(0); // possible choices: 0,>0,<0
 }
@@ -27,7 +25,7 @@ void flipimage::process(cv::Mat& ip, cv::Mat& op){
 }
 
 
-// mutator
+// mutators
 void flipimage::setParams(const short &f){
     flipcode = f;
 }

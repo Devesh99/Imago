@@ -40,7 +40,6 @@ void lowpassfilter::setParams(const int &indx, const int &fs){
     filter_size = fs;
 }
 
-
 void lowpassfilter::setParameters(QString str, ...){
     va_list(args);
     va_start(args, str);

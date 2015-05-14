@@ -3,9 +3,6 @@
 
 #include "iprocesstechnique.h"
 
-// --------------------------
-// Algorithm 1 - flip image
-// --------------------------
 class flipimage : public Iprocesstechnique
 {
 private:
@@ -21,7 +18,7 @@ public:
     // virtual process function definition
     void process(cv::Mat&, cv::Mat&); // not virtual since would not be derived further
 
-    // mutator
+    // mutators
     void setParams(const short int&);
 
     void setParameters(QString, ...);

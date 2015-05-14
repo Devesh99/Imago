@@ -20,9 +20,9 @@ public:
     virtual void process(cv::Mat&, cv::Mat&) = 0;
 
 
-    // mutator with variable number of arguments
+    // pure virtual mutator with variable number of arguments
     // since algorithms (may) differ in types AND number of parameters
-    virtual void setParameters(QString, ...) = 0;
+    virtual void setParameters(QString, ...) = 0; // QString as identifier of algorithm
 };
 
 

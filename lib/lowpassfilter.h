@@ -7,7 +7,7 @@ class lowpassfilter :public Iprocesstechnique
 {
 private:
     int filter_size;
-    int operation_indx;
+    int operation_indx; // type of LPF
 public:
     lowpassfilter();
     lowpassfilter(const int&, const int&);

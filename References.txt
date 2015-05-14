@@ -1,14 +1,15 @@
 References
 
 [1] http://stackoverflow.com/questions/34987/how-to-declare-an-array-of-strings-in-c
-[2] http://doc.qt.io/qt-4.8/qtimer.html
+[2] QTimer: http://doc.qt.io/qt-4.8/qtimer.html
 [3] Canny threshold: http://docs.opencv.org/doc/tutorials/imgproc/imgtrans/canny_detector/canny_detector.html
 [4] Variadic functions: http://www.codeproject.com/Articles/4181/Variable-Argument-Functions
 [5] About menu: http://doc.qt.io/qt-5/qtwidgets-mainwindows-application-example.html
 [6] Video writer OpenCV Mac:http://stackoverflow.com/questions/4872383/how-to-write-a-video-file-with-opencv
 [7] QFileInfo string parsing: http://stackoverflow.com/questions/15244911/removing-extension-of-a-file-name-in-qt
 [8] Video writer Mac codec fix: http://www.codeitive.com/0HmeejqXWg/how-to-write-a-video-file-with-opencv.html
-[9]: Video writer Mac like [8] mentions lower case: http://stackoverflow.com/questions/10605163/opencv-videowriter-under-osx-producing-no-output
+[9] Video writer Mac like [8] mentions lower case: http://stackoverflow.com/questions/10605163/opencv-videowriter-under-osx-producing-no-output
+[10] Qt shorctus mac: http://doc.qt.io/qt-4.8/qshortcut.html
 
 [A] OpenCV Cookbook
 [B] Tasbir, Abinash Pant

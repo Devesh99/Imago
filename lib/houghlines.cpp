@@ -19,8 +19,7 @@ houghlines::~houghlines(){
 
 
 void houghlines::process(cv::Mat &ip, cv::Mat &op){
-
-
+    // [A]
     cv::Mat contours;
 
     // processing on binary image, display on original image
@@ -38,7 +37,7 @@ void houghlines::process(cv::Mat &ip, cv::Mat &op){
         std::vector<cv::Vec2f> lines;
         cv::HoughLines(contours, lines, rho, theta, threshold);
 
-        // Display
+        // Display [A]
         std::vector<cv::Vec2f>::const_iterator it;
         for (it = lines.begin(); it!=lines.end(); it++) {
             float hlrho= (*it)[0];   // first element is distance rho

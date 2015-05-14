@@ -6,7 +6,7 @@
 class histogramequalize : public Iprocesstechnique
 {
 private:
-
+    // no parameters
 public:
     histogramequalize();
     ~histogramequalize();

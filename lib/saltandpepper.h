@@ -25,7 +25,6 @@ public:
     void salt(cv::Mat &, cv::Mat &,int);
     void pepper(cv::Mat &, cv::Mat &,int);
 
-
     // mutator function
     void setParams(const double&);
 

@@ -6,7 +6,7 @@
 class cannyedgedetector : public Iprocesstechnique
 {
 private:
-    int threshold; // edge detection threshold
+    int threshold; // edge detection low threshold
 
 public:
     cannyedgedetector();

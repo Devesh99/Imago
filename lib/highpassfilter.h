@@ -6,7 +6,7 @@
 class highpassfilter : public Iprocesstechnique
 {
 private:
-    int hpfindx;
+    int hpfindx; // filter type
 public:
     highpassfilter();
     highpassfilter(const int&);

@@ -17,7 +17,9 @@ houghcircles::~houghcircles(){
     // empty destructor
 }
 
+
 void houghcircles::process(cv::Mat &ip, cv::Mat &op){
+    // processing from [A]
     std::vector<cv::Vec3f> circles;
 
     // processing done on grayscale image
@@ -36,6 +38,7 @@ void houghcircles::process(cv::Mat &ip, cv::Mat &op){
         cv::circle(op, cv::Point((*itc)[0], (*itc)[1]), (*itc)[2], cv::Scalar(255,0,0), 2); // plot in blue if color, else white
     }
 }
+
 
 void houghcircles::setParameters(QString str, ...){
     va_list args;

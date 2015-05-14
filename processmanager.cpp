@@ -1,5 +1,4 @@
 #include "processmanager.h"
-#include "stringsglobals.h"
 
 #include <QFileInfo>
 
@@ -14,10 +13,10 @@ processmanager::processmanager()
     framedelay = 0; // error-handling: otherwise garbage value. (though handlers set timer framedelay anyway, so not necessarily required)
     timer = new QTimer(this);
 
-    connect(timer, SIGNAL(timeout()),this, SLOT(ReadFrame()));
+    connect(timer, SIGNAL(timeout()),this, SLOT(ReadFrame())); // video/livestream reaading frame with timer firing
 
-    QObject::connect(this, SIGNAL(ImageReadyOutput()), this, SLOT(SaveFrame()));
-    isSaveVideo = false;
+    QObject::connect(this, SIGNAL(ImageReadyOutput()), this, SLOT(SaveFrame())); // save video as output ready
+    isSaveVideo = false; // flag to determine daving video
 }
 
 
@@ -126,6 +125,8 @@ void processmanager::AddTechnique(QString str, ...){
 
     Iprocesstechnique* pt;
 
+    // string comparison determines which algorithm is added (sent from interface)
+    // parameter constructor of algorithm classes
     if (str.compare(canny) == 0){
         int thresh = va_arg(args, int);
         pt = new cannyedgedetector(thresh);
@@ -174,8 +175,7 @@ void processmanager::AddTechnique(QString str, ...){
     }
 
 
-
-    processtechniquesList.push_back(pt);
+    processtechniquesList.push_back(pt); // add to process flow
 
     va_end(args);
 
@@ -188,6 +188,7 @@ void processmanager::setParameters(QString str, int indx, ...){
     va_list args;
     va_start(args, indx);
 
+    // index to determine which element of process flow (also sent from interface - list widget index)
     if (str.compare(canny) == 0){
         int thresh = va_arg(args, int);
         processtechniquesList[indx]->setParameters(str, thresh);
@@ -244,6 +245,7 @@ void processmanager::setParameters(QString str, int indx, ...){
 
 // move process in process flow
 void processmanager::moveProcessTechnique(const int &indx1, const int &indx2){
+    // Swap
     Iprocesstechnique* pt = processtechniquesList[indx1];
     processtechniquesList[indx1] = processtechniquesList[indx2];
     processtechniquesList[indx2] = pt;
@@ -266,6 +268,7 @@ void processmanager::refreshProcessTechnique(void){
         process();
     }
 }
+
 
 // --------------------------
 // Process function
@@ -311,7 +314,7 @@ void processmanager::loadVideo(std::string filename){
 
     capture.open(filename);
     if (capture.isOpened()){
-        double rate = capture.get(CV_CAP_PROP_FPS);
+        double rate = capture.get(CV_CAP_PROP_FPS); // frame rate of video
         framedelay=1000/rate;
         // timer restarts (no need to stop and start) [2]
         timer->start(framedelay); // set for pause/play utilization
@@ -335,7 +338,7 @@ void processmanager::loadLiveStream(){
     capture.open(0);
     if (capture.isOpened()){
         // timer restarts (no need to stop and start) [2]
-        framedelay = 0; // set for pause/play utilization
+        framedelay = 0;
         timer->start(framedelay);
 
         setFileNameSave("livestream");
@@ -352,7 +355,11 @@ void processmanager::ReadFrame(){
 void processmanager::SaveFrame(){
     if (getSaveVideoFlag()){
         if (writer.isOpened()){
-            writer.write(getOutputImage());
+            cv::Mat temp = getOutputImage().clone();
+            if (temp.channels()>1){ // QUICK FIX: not saving grayscae images, since crashes if color + grayscale mixed in video saving. Improve this by getting the channels of the first frame to be saved, and save those which match it after processing.
+                writer.write(getOutputImage());
+            }
+
         }
     }
 }
@@ -376,31 +383,22 @@ void processmanager::saveImage(std::string filename){
 }
 
 void processmanager::saveVideo(QString filename){
-    // FIX: video writer does not seem to work with Mac [6]
-
-
-    //        writer.open(filename.toStdString(), CV_FOURCC('j','p','e','g'), 1000.0/framedelay, cv::Size(op.cols, op.rows) );
-    //        writer.open(filename.toStdString(), CV_FOURCC('j','p','e','g'), capture.get(CV_CAP_PROP_FPS)*1.0, cv::Size(capture.get(CV_CAP_PROP_FRAME_WIDTH), capture.get(CV_CAP_PROP_FRAME_HEIGHT)) );
-    //            writer.open(filename.toStdString(), CV_FOURCC('j','p','e','g'), 1000/framedelay, cv::Size(op.cols, op.rows) );
+    // FIXED: video writer does not seem to work with Mac [6] resolved using [8], [9]
 
     if (capture.isOpened()){
-        if (framedelay == 0){
-            writer.open(filename.toStdString(), CV_FOURCC('j','p','e','g'), 15, cv::Size(op.cols, op.rows) );
+        if (framedelay == 0){ // live stream
+            writer.open(filename.toStdString(), CV_FOURCC('j','p','e','g'), 15, cv::Size(op.cols, op.rows) ); // setting save frame rate of 15
         }
         else{
-            writer.open(filename.toStdString(), CV_FOURCC('j','p','e','g'), 1000/framedelay, cv::Size(op.cols, op.rows) );
+            writer.open(filename.toStdString(), CV_FOURCC('j','p','e','g'), 1000/framedelay, cv::Size(op.cols, op.rows) ); // using video frame rate for saving
         }
     }
     else{
-            writer.open(filename.toStdString(), CV_FOURCC('j','p','e','g'), 1, cv::Size(op.cols, op.rows) );
+            writer.open(filename.toStdString(), CV_FOURCC('j','p','e','g'), 1, cv::Size(op.cols, op.rows) ); // images save at 1 frame per second to see results
     }
 
-
-
-    setSaveVideoFlag(true);
+    setSaveVideoFlag(true); // save started
 }
-
-
 
 void processmanager::setFileNameSave(std::string str){
     fileNameSave = str;
@@ -409,7 +407,6 @@ void processmanager::setFileNameSave(std::string str){
 std::string processmanager::getFileNameSave(void)const{
     return fileNameSave;
 }
-
 
 void processmanager::setSaveVideoFlag(bool flag){
     isSaveVideo = flag;

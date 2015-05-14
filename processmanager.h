@@ -1,14 +1,14 @@
 #ifndef PROCESSMANAGER_H
 #define PROCESSMANAGER_H
 
-#include "iprocesstechnique.h"
-#include "allalgorithms.h" // to be able to instantiate objects of each algorithm (mutators through dynamic casting)
+#include "lib/iprocesstechnique.h"
+#include "lib/allalgorithms.h" // to be able to access all algorithms
+#include "lib/stringsglobals.h" // string comparisons
 
 #include <QObject>
 #include <QImage>
-#include <QString>
 #include <QTimer>
-#include <cstdarg>
+#include <cstdarg> // variadic functions
 
 // --------------------------
 // Controller class
@@ -29,7 +29,6 @@ private:
     QImage ipQImage;
     QImage opQImage;
 
-
     // saving filename
     std::string fileNameSave;
 
@@ -39,7 +38,7 @@ private:
     int framedelay; // for timer object
 
     cv::VideoWriter writer;
-    bool isSaveVideo;
+    bool isSaveVideo; // save/stop save video
 
 public:
     processmanager(); // constructor
@@ -72,12 +71,14 @@ public:
     void setFileNameSave(std::string);
     std::string getFileNameSave(void)const;
 
+
     // --------------------------
     // Add/move/remove/refresh processing techniques
     // --------------------------
     void moveProcessTechnique(const int&, const int&);
     void removeProcessTechnique(const int&);
     void refreshProcessTechnique(void);
+
 
     // --------------------------
     // Image/Video/live stream handlers
@@ -93,6 +94,7 @@ public:
 
     bool getSaveVideoFlag()const;
     void setSaveVideoFlag(bool);
+
 
     // --------------------------
     // Process techniques functions

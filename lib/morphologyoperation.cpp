@@ -50,6 +50,7 @@ void morphologyoperation::process(cv::Mat &ip, cv::Mat &op){
 
 }
 
+
 int morphologyoperation::determineElementShape(const int &elem_shapeindx){
     switch (elem_shapeindx){
     case 0:
@@ -69,7 +70,6 @@ void morphologyoperation::setParams(const int &val1, const int &val2, const int&
     elem_shape = determineElementShape(val2);
     elem_size = val3;
 }
-
 
 void morphologyoperation::setParameters(QString str, ...){
     va_list args;

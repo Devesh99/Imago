@@ -17,9 +17,11 @@ cannyedgedetector::~cannyedgedetector(){
     // empty destructor
 }
 
+
 void cannyedgedetector::process(cv::Mat & ip, cv::Mat & op){
     cv::Canny(ip, op, threshold, 3*threshold); // using 3*threshold as higher threshold as suggested in paper and docs [3]
 }
+
 
 void cannyedgedetector::setParams(const int &thresh){
     threshold = thresh;
