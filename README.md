@@ -18,4 +18,5 @@ deveshadlakha@gmail.com
   1. Configure the .pro file with the path to the OpenCV libraries in the system
 
 
-
+# User manual
+Coming soon.
