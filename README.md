@@ -1,10 +1,11 @@
 # Imago
 
-Imago is image processing an interface to an image processing toolbox, developed in C++ using Qt 5.1.1 and OpenCV 2.4.8.
+Imago is an interface to an image processing toolbox, developed in C++ using Qt 5.1.1 and OpenCV 2.4.8.
 
 This application was tested on a MacBook Pro with the following specifications:
-* Processor: 2.53 GHz Intel Core 2 Dui
+* Processor: 2.53 GHz Intel Core 2 Duo
 * Memory: 4 GB
+* Screen: 13" (1280x800)
 
 Devesh Adlakha
 deveshadlakha@gmail.com
