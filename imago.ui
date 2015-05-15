@@ -820,7 +820,7 @@
    </property>
    <widget class="QMenu" name="menuImago">
     <property name="title">
-     <string>Open</string>
+     <string>Load</string>
     </property>
     <addaction name="actionOpen_Image"/>
     <addaction name="actionOpen_Video"/>

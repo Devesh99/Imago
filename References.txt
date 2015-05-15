@@ -11,9 +11,9 @@ References
 [9] Video writer Mac like [8] mentions lower case: http://stackoverflow.com/questions/10605163/opencv-videowriter-under-osx-producing-no-output
 [10] Qt shorctus mac: http://doc.qt.io/qt-4.8/qshortcut.html
 
-[A] OpenCV Cookbook
-[B] Tasbir, Abinash Pant
-[C] VPProject, Marwan Osman
+[A] OpenCV Cookbook: https://www.packtpub.com/application-development/opencv-2-computer-vision-application-programming-cookbook
+[B] Tasbir, Abinash Pant: https://sites.google.com/site/mscvfive/abinashpant
+[C] VPProject, Marwan Osman: https://sites.google.com/site/mscvfive/marwanosman
 
 
 Icons:
